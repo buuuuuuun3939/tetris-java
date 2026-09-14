@@ -10,6 +10,8 @@ class GamePanel extends JPanel implements KeyListener {
     private int blockX = 100;
     private int blockY = 100;
     private final int BLOCK_SIZE = 30;
+    //private final int PANEL_WIDTH = 400;
+    private final int PANEL_HEIGHT = 600;
     private Timer timer;
 
     public GamePanel() {
@@ -19,9 +21,11 @@ class GamePanel extends JPanel implements KeyListener {
 
         // 500ミリ秒ごとに処理する
         timer = new Timer(500, e -> {
-            blockY += BLOCK_SIZE;
-
+            if (blockY + BLOCK_SIZE < getHeight()) {
+                blockY += BLOCK_SIZE;
+            }
             repaint();
+
         });
 
         timer.start();
