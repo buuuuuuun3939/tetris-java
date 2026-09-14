@@ -1,3 +1,4 @@
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -7,14 +8,18 @@ import javax.swing.Timer;
 class GamePanel extends JPanel implements KeyListener {
 
     // ブロックの位置
-    private int blockX = 100;
-    private int blockY = 100;
+    private int blockX = 90;
+    private int blockY = 120;
     private final int BLOCK_SIZE = 30;
     //private final int PANEL_WIDTH = 400;
     private final int PANEL_HEIGHT = 600;
     private Timer timer;
 
     public GamePanel() {
+        setPreferredSize(new Dimension(
+            Board.COLS * Board.BLOCK_SIZE,
+            Board.ROWS * Board.BLOCK_SIZE
+        ));
 
         setFocusable(true);
         addKeyListener(this);
@@ -35,13 +40,30 @@ class GamePanel extends JPanel implements KeyListener {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
 
-        // ブロックを描画
-        // g.fillRect(blockX, blockY, 30, 30);
+        // Boardを描画
+        for (int row = 0; row < Board.ROWS; row++) {
+            for (int col = 0; col < Board.COLS; col++) {
 
-        g.fillRect(blockX, blockY, 30, 30);
-        g.fillRect(blockX + 30, blockY, 30, 30);
-        g.fillRect(blockX + 60, blockY, 30, 30);
-        g.fillRect(blockX + 90, blockY, 30, 30);
+                int x = col * Board.BLOCK_SIZE;
+                int y = row * Board.BLOCK_SIZE;
+
+                g.drawRect(
+                    x,
+                    y,
+                    Board.BLOCK_SIZE,
+                    Board.BLOCK_SIZE
+                );
+            }
+        }
+
+        // I字ブロック
+        g.fillRect(blockX, blockY, Board.BLOCK_SIZE, Board.BLOCK_SIZE);
+        g.fillRect(blockX + Board.BLOCK_SIZE, blockY,
+                   Board.BLOCK_SIZE, Board.BLOCK_SIZE);
+        g.fillRect(blockX + Board.BLOCK_SIZE * 2, blockY,
+                   Board.BLOCK_SIZE, Board.BLOCK_SIZE);
+        g.fillRect(blockX + Board.BLOCK_SIZE * 3, blockY,
+                   Board.BLOCK_SIZE, Board.BLOCK_SIZE);
 
         //Tetromino tetromino = new Tetromino();
     }
@@ -50,16 +72,16 @@ class GamePanel extends JPanel implements KeyListener {
     public void keyPressed(KeyEvent e) {
 
         if (e.getKeyCode() == KeyEvent.VK_LEFT) {
-            blockX -= 30;
+            blockX -= Board.BLOCK_SIZE;
         }
 
         if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
-            blockX += 30;
+            blockX += Board.BLOCK_SIZE;
         }
 
-        if (e.getKeyCode() == KeyEvent.VK_DOWN) {
-            blockY += 30;
-        }
+        // if (e.getKeyCode() == KeyEvent.VK_DOWN) {
+        //     blockY += Board.BLOCK_SIZE;
+        // }
 
         repaint();
     }

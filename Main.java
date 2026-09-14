@@ -6,7 +6,7 @@ public class Main {
         GamePanel panel = new GamePanel();
 
         frame.add(panel);
-        frame.setSize(400, 600);
+        frame.pack();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
 
