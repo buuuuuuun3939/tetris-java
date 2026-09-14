@@ -2,17 +2,29 @@ import java.awt.Graphics;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import javax.swing.JPanel;
+import javax.swing.Timer;
 
 class GamePanel extends JPanel implements KeyListener {
 
     // ブロックの位置
     private int blockX = 100;
     private int blockY = 100;
+    private final int BLOCK_SIZE = 30;
+    private Timer timer;
 
     public GamePanel() {
-        // キーボード入力を受け取る
+
         setFocusable(true);
         addKeyListener(this);
+
+        // 500ミリ秒ごとに処理する
+        timer = new Timer(500, e -> {
+            blockY += BLOCK_SIZE;
+
+            repaint();
+        });
+
+        timer.start();
     }
 
     @Override
