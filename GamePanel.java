@@ -89,13 +89,13 @@ class GamePanel extends JPanel implements KeyListener {
     public void keyPressed(KeyEvent e) {
 
         if (e.getKeyCode() == KeyEvent.VK_LEFT) {
-            if (blockX - Board.BLOCK_SIZE >= 0) {
+            if (canMoveLeft()) {
                 blockX -= Board.BLOCK_SIZE;
             }
         }
 
         if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
-            if (blockX + Board.BLOCK_SIZE * 4 < Board.getWidth()) {
+            if (canMoveRight()) {
                 blockX += Board.BLOCK_SIZE;
             }
         }
@@ -112,7 +112,60 @@ class GamePanel extends JPanel implements KeyListener {
     }
 
     private boolean canMoveDown() {
-        return blockY + Board.BLOCK_SIZE < board.getHeight();
+        int nextRow = (blockY + Board.BLOCK_SIZE) / Board.BLOCK_SIZE;
+        int col = blockX / Board.BLOCK_SIZE;
+
+        // Boardの一番下
+        if (nextRow >= Board.ROWS) {
+            return false;
+        }
+
+        // I字ミノの4マスを確認
+        for (int i = 0; i < 4; i++) {
+            if (board.getBlock(nextRow, col + i) == 1) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private boolean canMoveLeft() {
+        int row = blockY / Board.BLOCK_SIZE;
+        int col = blockX / Board.BLOCK_SIZE;
+
+        // Boardの左端
+        if (col <= 0) {
+            return false;
+        }
+
+        // I字ミノの左端を確認
+        if (board.getBlock(row, col - 1) == 1) {
+            return false;
+        }
+
+        return true;
+    }
+
+
+    private boolean canMoveRight() {
+        int row = blockY / Board.BLOCK_SIZE;
+        int col = blockX / Board.BLOCK_SIZE;
+
+        // I字ミノの右端
+        int rightCol = col + 3;
+
+        // Boardの右端
+        if (rightCol >= Board.COLS - 1) {
+            return false;
+        }
+
+        // 右隣に固定ブロックがある
+        if (board.getBlock(row, rightCol + 1) == 1) {
+            return false;
+        }
+
+        return true;
     }
 
     private void lockBlock() {
