@@ -30,9 +30,11 @@ class GamePanel extends JPanel implements KeyListener {
         timer = new Timer(500, e -> {
             if (canMoveDown()) {
                 blockY += BLOCK_SIZE;
+            } else {
+                lockBlock();
             }
-            repaint();
 
+            repaint();
         });
 
         timer.start();
@@ -96,7 +98,17 @@ class GamePanel extends JPanel implements KeyListener {
     public void keyReleased(KeyEvent e) {
     }
 
-    private     boolean canMoveDown() {
+    private boolean canMoveDown() {
         return blockY + Board.BLOCK_SIZE < board.getHeight();
+    }
+
+    private void lockBlock() {
+        int row = blockY / Board.BLOCK_SIZE;
+        int col = blockX / Board.BLOCK_SIZE;
+
+        board.setBlock(row, col);
+        board.setBlock(row, col + 1);
+        board.setBlock(row, col + 2);
+        board.setBlock(row, col + 3);
     }
 }

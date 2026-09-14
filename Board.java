@@ -12,4 +12,12 @@ public class Board {
     public int getHeight() {
         return ROWS * BLOCK_SIZE;
     }
+
+    public void setBlock(int row, int col) {
+        board[row][col] = 1;
+    }
+
+    public int getBlock(int row, int col) {
+        return board[row][col];
+    }
 }
