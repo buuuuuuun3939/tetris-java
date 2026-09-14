@@ -11,7 +11,7 @@ class GamePanel extends JPanel implements KeyListener {
     private int blockX = 90;
     private int blockY = 120;
     private final int BLOCK_SIZE = 30;
-    //private final int PANEL_WIDTH = 400;
+    private final int PANEL_WIDTH = 400;
     private final int PANEL_HEIGHT = 600;
     private Timer timer;
 
@@ -72,16 +72,16 @@ class GamePanel extends JPanel implements KeyListener {
     public void keyPressed(KeyEvent e) {
 
         if (e.getKeyCode() == KeyEvent.VK_LEFT) {
-            blockX -= Board.BLOCK_SIZE;
+            if (blockX - Board.BLOCK_SIZE >= 0) {
+                blockX -= Board.BLOCK_SIZE;
+            }
         }
 
         if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
-            blockX += Board.BLOCK_SIZE;
+            if (blockX + Board.BLOCK_SIZE * 4 < Board.getWidth()) {
+                blockX += Board.BLOCK_SIZE;
+            }
         }
-
-        // if (e.getKeyCode() == KeyEvent.VK_DOWN) {
-        //     blockY += Board.BLOCK_SIZE;
-        // }
 
         repaint();
     }

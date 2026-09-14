@@ -5,7 +5,7 @@ public class Board {
 
     private int[][] board = new int[ROWS][COLS];
 
-    public int getWidth() {
+    public static int getWidth() {
         return COLS * BLOCK_SIZE;
     }
 
