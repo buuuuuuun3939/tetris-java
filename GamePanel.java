@@ -32,6 +32,9 @@ class GamePanel extends JPanel implements KeyListener {
                 blockY += BLOCK_SIZE;
             } else {
                 lockBlock();
+
+                blockX = 90;
+                blockY = 120;
             }
 
             repaint();
@@ -51,12 +54,22 @@ class GamePanel extends JPanel implements KeyListener {
                 int x = col * Board.BLOCK_SIZE;
                 int y = row * Board.BLOCK_SIZE;
 
+                // マス目
                 g.drawRect(
+                    x,
+                    y,
+                    Board.BLOCK_SIZE - 1,
+                    Board.BLOCK_SIZE - 1
+                );
+
+                // 固定されたブロック
+                if (board.getBlock(row, col) == 1) {
+                    g.fillRect(
                     x,
                     y,
                     Board.BLOCK_SIZE,
                     Board.BLOCK_SIZE
-                );
+                );}
             }
         }
 
