@@ -1,21 +1,25 @@
 public class Tetromino {
 
-    private int x = 0;
-    private int y = 0;
-
     private int[][] shape = {
         {1, 1, 1, 1}
     };
 
-    public int getX() {
-        return x;
-    }
-
-    public int getY() {
-        return y;
-    }
-
     public int[][] getShape() {
         return shape;
+    }
+
+    public void rotate() {
+        int rows = shape.length;
+        int cols = shape[0].length;
+        int[][] rotated = new int[cols][rows];
+
+        for (int row = 0; row < rows; row++) {
+            for (int col = 0; col < cols; col++) {
+
+                rotated[col][rows - 1 - row] = shape[row][col];
+            }
+        }
+
+        shape = rotated;
     }
 }

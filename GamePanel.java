@@ -15,9 +15,11 @@ class GamePanel extends JPanel implements KeyListener {
     private final int PANEL_HEIGHT = 600;
     private Board board;
     private Timer timer;
+    private Tetromino tetromino;
 
     public GamePanel() {
         board = new Board();
+        tetromino = new Tetromino();
         setPreferredSize(new Dimension(
             Board.COLS * Board.BLOCK_SIZE,
             Board.ROWS * Board.BLOCK_SIZE
@@ -73,16 +75,24 @@ class GamePanel extends JPanel implements KeyListener {
             }
         }
 
-        // I字ブロック
-        g.fillRect(blockX, blockY, Board.BLOCK_SIZE, Board.BLOCK_SIZE);
-        g.fillRect(blockX + Board.BLOCK_SIZE, blockY,
-                   Board.BLOCK_SIZE, Board.BLOCK_SIZE);
-        g.fillRect(blockX + Board.BLOCK_SIZE * 2, blockY,
-                   Board.BLOCK_SIZE, Board.BLOCK_SIZE);
-        g.fillRect(blockX + Board.BLOCK_SIZE * 3, blockY,
-                   Board.BLOCK_SIZE, Board.BLOCK_SIZE);
+        int[][] shape = tetromino.getShape();
 
-        //Tetromino tetromino = new Tetromino();
+        for (int row = 0; row < shape.length; row++) {
+            for (int col = 0; col < shape[row].length; col++) {
+
+                if (shape[row][col] == 1) {
+                    int x = blockX + col * Board.BLOCK_SIZE;
+                    int y = blockY + row * Board.BLOCK_SIZE;
+
+                    g.fillRect(
+                        x,
+                        y,
+                        Board.BLOCK_SIZE,
+                        Board.BLOCK_SIZE
+                    );
+                }
+            }
+        }
     }
 
     @Override
@@ -98,6 +108,10 @@ class GamePanel extends JPanel implements KeyListener {
             if (canMoveRight()) {
                 blockX += Board.BLOCK_SIZE;
             }
+        }
+
+        if (e.getKeyCode() == KeyEvent.VK_UP) {
+            tetromino.rotate();
         }
 
         repaint();
