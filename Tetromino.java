@@ -1,8 +1,10 @@
+import java.awt.Color;
 import java.util.Random;
 
 public class Tetromino {
     private TetrominoType type;
     private int[][] shape;
+    private Color color;
     private static final Random random = new Random();
 
     public Tetromino(TetrominoType type) {
@@ -23,42 +25,49 @@ public class Tetromino {
                 shape = new int[][] {
                     {1, 1, 1, 1}
                 };
+                color = Color.CYAN;
                 break;
             case O:
                 shape = new int[][] {
                     {1, 1},
                     {1, 1}
                 };
+                color = Color.YELLOW;
                 break;
             case T:
                 shape = new int[][] {
                     {0, 1, 0},
                     {1, 1, 1}
                 };
+                color = Color.MAGENTA;
                 break;
             case S:
                 shape = new int[][] {
                     {0, 1, 1},
                     {1, 1, 0}
                 };
+                color = Color.GREEN;
                 break;
             case Z:
                 shape = new int[][] {
                     {1, 1, 0},
                     {0, 1, 1}
                 };
+                color = Color.RED;
                 break;
             case J:
                 shape = new int[][] {
                     {1, 0, 0},
                     {1, 1, 1}
                 };
+                color = Color.BLUE;
                 break;
             case L:
                 shape = new int[][] {
                     {0, 0, 1},
                     {1, 1, 1}
                 };
+                color = Color.ORANGE;
                 break;
         }
     }
@@ -89,5 +98,9 @@ public class Tetromino {
         }
 
         return rotated;
+    }
+
+    public Color getColor() {
+        return color;
     }
 }

@@ -91,6 +91,7 @@ class GamePanel extends JPanel implements KeyListener {
         }
 
         int[][] shape = tetromino.getShape();
+        g.setColor(tetromino.getColor());
 
         for (int row = 0; row < shape.length; row++) {
             for (int col = 0; col < shape[row].length; col++) {
