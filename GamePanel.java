@@ -9,7 +9,7 @@ class GamePanel extends JPanel implements KeyListener {
 
     // ブロックの位置
     private int blockX = 90;
-    private int blockY = 120;
+    private int blockY = 0;
     private int score = 0;
     private final int BLOCK_SIZE = 30;
     private final int PANEL_WIDTH = 400;
@@ -39,7 +39,7 @@ class GamePanel extends JPanel implements KeyListener {
                 score += board.clearFullRows() * 100;
 
                 blockX = 90;
-                blockY = 120;
+                blockY = 0;
 
                 tetromino.reset();
 
