@@ -14,6 +14,7 @@ class GamePanel extends JPanel implements KeyListener {
     private final int BLOCK_SIZE = 30;
     private final int PANEL_WIDTH = 400;
     private final int PANEL_HEIGHT = 600;
+    private boolean gameOver = false;
     private Board board;
     private Timer timer;
     private Tetromino tetromino;
@@ -41,6 +42,11 @@ class GamePanel extends JPanel implements KeyListener {
                 blockY = 120;
 
                 tetromino.reset();
+
+                if (!canSpawn()) {
+                    gameOver = true;
+                    timer.stop();
+                }
             }
 
             repaint();
@@ -99,10 +105,17 @@ class GamePanel extends JPanel implements KeyListener {
         }
 
         g.drawString("Score: " + score, 10, 20);
+
+        if (gameOver) {
+            g.drawString("GAME OVER", 100, 300);
+        }
     }
 
     @Override
     public void keyPressed(KeyEvent e) {
+        if (gameOver) {
+            return;
+        }
 
         if (e.getKeyCode() == KeyEvent.VK_LEFT) {
             if (canMoveLeft()) {
@@ -267,5 +280,30 @@ class GamePanel extends JPanel implements KeyListener {
                 }
             }
         }
+    }
+
+    private boolean canSpawn() {
+        int[][] shape = tetromino.getShape();
+        int startRow = 0;
+        int startCol = blockX / Board.BLOCK_SIZE;
+
+        for (int row = 0; row < shape.length; row++) {
+            for (int col = 0; col < shape[row].length; col++) {
+
+                // 形状がない部分は無視
+                if (shape[row][col] == 0) {
+                    continue;
+                }
+
+                int boardRow = startRow + row;
+                int boardCol = startCol + col;
+
+                if (board.getBlock(boardRow, boardCol) == 1) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 }
