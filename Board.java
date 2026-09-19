@@ -20,4 +20,37 @@ public class Board {
     public int getBlock(int row, int col) {
         return board[row][col];
     }
+
+    public boolean isRowFull(int row) {
+        for (int col = 0; col < COLS; col++) {
+            if (board[row][col] == 0) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public void clearRow(int row) {
+        // 上の行を下にずらす
+        for (int r = row; r > 0; r--) {
+            for (int col = 0; col < COLS; col++) {
+                board[r][col] = board[r - 1][col];
+            }
+        }
+
+        // 一行空にする
+        for (int col = 0; col < COLS; col++) {
+            board[0][col] = 0;
+        }
+    }
+
+    public void clearFullRows() {
+        for (int row = ROWS - 1; row >= 0; row--) {
+            if (isRowFull(row)) {
+                clearRow(row);
+                row++;
+            }
+        }
+    }
 }

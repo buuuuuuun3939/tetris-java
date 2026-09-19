@@ -4,6 +4,12 @@ public class Tetromino {
         {1, 1, 1, 1}
     };
 
+    public void reset() {
+        shape = new int[][] {
+            {1, 1, 1, 1}
+        };
+    }
+
     public int[][] getShape() {
         return shape;
     }

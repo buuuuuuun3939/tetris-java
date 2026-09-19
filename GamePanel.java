@@ -34,9 +34,12 @@ class GamePanel extends JPanel implements KeyListener {
                 blockY += BLOCK_SIZE;
             } else {
                 lockBlock();
+                board.clearFullRows();
 
                 blockX = 90;
                 blockY = 120;
+
+                tetromino.reset();
             }
 
             repaint();
