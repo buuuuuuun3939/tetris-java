@@ -219,14 +219,14 @@ class GamePanel extends JPanel implements KeyListener {
     }
 
     private boolean canRotate() {
-        int[][] shape = tetromino.getRotatedShape();
+        int[][] rotatedShape = tetromino.getRotatedShape();
         int currentRow = blockY / Board.BLOCK_SIZE;
         int currentCol = blockX / Board.BLOCK_SIZE;
 
-        for (int row = 0; row < shape.length; row++) {
-            for (int col = 0; col < shape[row].length; col++) {
+        for (int row = 0; row < rotatedShape.length; row++) {
+            for (int col = 0; col < rotatedShape[row].length; col++) {
 
-                if (shape[row][col] == 0) {
+                if (rotatedShape[row][col] == 0) {
                     continue;
                 }
 
@@ -250,14 +250,14 @@ class GamePanel extends JPanel implements KeyListener {
     }
 
     private void lockBlock() {
-        int row = blockY / Board.BLOCK_SIZE;
-        int col = blockX / Board.BLOCK_SIZE;
+        int currentRow = blockY / Board.BLOCK_SIZE;
+        int currentCol = blockX / Board.BLOCK_SIZE;
         int[][] shape = tetromino.getShape();
 
         for (int r = 0; r < shape.length; r++) {
             for (int c = 0; c < shape[r].length; c++) {
                 if (shape[r][c] == 1) {
-                    board.setBlock(row + r, col + c);
+                    board.setBlock(currentRow + r, currentCol + c);
                 }
             }
         }
