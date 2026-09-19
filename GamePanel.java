@@ -24,7 +24,7 @@ class GamePanel extends JPanel implements KeyListener {
 
     public GamePanel() {
         board = new Board();
-        tetromino = new Tetromino();
+        tetromino = new Tetromino(TetrominoType.T);
         spawnTetromino();
 
         setPreferredSize(new Dimension(

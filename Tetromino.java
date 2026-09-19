@@ -1,13 +1,60 @@
 public class Tetromino {
+    private TetrominoType type;
+    private int[][] shape;
 
-    private int[][] shape = {
-        {1, 1, 1, 1}
-    };
+    public Tetromino(TetrominoType type) {
+        this.type = type;
+        setShape();
+    }
+
+    private void setShape() {
+        switch (type) {
+            case I:
+                shape = new int[][] {
+                    {1, 1, 1, 1}
+                };
+                break;
+            case O:
+                shape = new int[][] {
+                    {1, 1},
+                    {1, 1}
+                };
+                break;
+            case T:
+                shape = new int[][] {
+                    {0, 1, 0},
+                    {1, 1, 1}
+                };
+                break;
+            case S:
+                shape = new int[][] {
+                    {0, 1, 1},
+                    {1, 1, 0}
+                };
+                break;
+            case Z:
+                shape = new int[][] {
+                    {1, 1, 0},
+                    {0, 1, 1}
+                };
+                break;
+            case J:
+                shape = new int[][] {
+                    {1, 0, 0},
+                    {1, 1, 1}
+                };
+                break;
+            case L:
+                shape = new int[][] {
+                    {0, 0, 1},
+                    {1, 1, 1}
+                };
+                break;
+        }
+    }
 
     public void reset() {
-        shape = new int[][] {
-            {1, 1, 1, 1}
-        };
+        setShape();
     }
 
     public int[][] getShape() {
