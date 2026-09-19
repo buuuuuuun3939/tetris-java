@@ -24,7 +24,7 @@ class GamePanel extends JPanel implements KeyListener {
 
     public GamePanel() {
         board = new Board();
-        tetromino = new Tetromino(TetrominoType.T);
+        tetromino = Tetromino.createRandom();
         spawnTetromino();
 
         setPreferredSize(new Dimension(
@@ -324,6 +324,6 @@ class GamePanel extends JPanel implements KeyListener {
         blockX = SPAWN_COL * Board.BLOCK_SIZE;
         blockY = SPAWN_ROW * Board.BLOCK_SIZE;
 
-        tetromino.reset();
+        tetromino = Tetromino.createRandom();
     }
 }

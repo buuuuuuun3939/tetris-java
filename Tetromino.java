@@ -1,10 +1,20 @@
+import java.util.Random;
+
 public class Tetromino {
     private TetrominoType type;
     private int[][] shape;
+    private static final Random random = new Random();
 
     public Tetromino(TetrominoType type) {
         this.type = type;
         setShape();
+    }
+
+    public static Tetromino createRandom() {
+        TetrominoType[] types = TetrominoType.values();
+        int index = random.nextInt(types.length);
+
+        return new Tetromino(types[index]);
     }
 
     private void setShape() {
