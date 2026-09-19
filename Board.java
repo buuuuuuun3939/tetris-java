@@ -45,12 +45,18 @@ public class Board {
         }
     }
 
-    public void clearFullRows() {
+    public int clearFullRows() {
+        int clearedRows = 0;
+
         for (int row = ROWS - 1; row >= 0; row--) {
             if (isRowFull(row)) {
                 clearRow(row);
+
+                clearedRows++;
                 row++;
             }
         }
+
+        return clearedRows;
     }
 }

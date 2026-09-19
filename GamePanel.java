@@ -10,6 +10,7 @@ class GamePanel extends JPanel implements KeyListener {
     // ブロックの位置
     private int blockX = 90;
     private int blockY = 120;
+    private int score = 0;
     private final int BLOCK_SIZE = 30;
     private final int PANEL_WIDTH = 400;
     private final int PANEL_HEIGHT = 600;
@@ -34,7 +35,7 @@ class GamePanel extends JPanel implements KeyListener {
                 blockY += BLOCK_SIZE;
             } else {
                 lockBlock();
-                board.clearFullRows();
+                score += board.clearFullRows() * 100;
 
                 blockX = 90;
                 blockY = 120;
@@ -96,6 +97,8 @@ class GamePanel extends JPanel implements KeyListener {
                 }
             }
         }
+
+        g.drawString("Score: " + score, 10, 20);
     }
 
     @Override
