@@ -14,7 +14,10 @@ class GamePanel extends JPanel implements KeyListener {
     private final int BLOCK_SIZE = 30;
     private final int PANEL_WIDTH = 400;
     private final int PANEL_HEIGHT = 600;
+    private static final int SPAWN_ROW = 0;
+    private static final int SPAWN_COL = 3;
     private boolean gameOver = false;
+
     private Board board;
     private Timer timer;
     private Tetromino tetromino;
@@ -22,6 +25,8 @@ class GamePanel extends JPanel implements KeyListener {
     public GamePanel() {
         board = new Board();
         tetromino = new Tetromino();
+        spawnTetromino();
+
         setPreferredSize(new Dimension(
             Board.COLS * Board.BLOCK_SIZE,
             Board.ROWS * Board.BLOCK_SIZE
@@ -41,7 +46,7 @@ class GamePanel extends JPanel implements KeyListener {
                 blockX = 90;
                 blockY = 0;
 
-                tetromino.reset();
+                spawnTetromino();
 
                 if (!canSpawn()) {
                     gameOver = true;
@@ -298,6 +303,14 @@ class GamePanel extends JPanel implements KeyListener {
                 int boardRow = startRow + row;
                 int boardCol = startCol + col;
 
+                if (boardRow >= Board.ROWS) {
+                    return false;
+                }
+
+                if (boardCol < 0 || boardCol >= Board.COLS) {
+                    return false;
+                }
+
                 if (board.getBlock(boardRow, boardCol) == 1) {
                     return false;
                 }
@@ -305,5 +318,12 @@ class GamePanel extends JPanel implements KeyListener {
         }
 
         return true;
+    }
+
+    private void spawnTetromino() {
+        blockX = SPAWN_COL * Board.BLOCK_SIZE;
+        blockY = SPAWN_ROW * Board.BLOCK_SIZE;
+
+        tetromino.reset();
     }
 }
