@@ -9,6 +9,11 @@ public class Tetromino {
     }
 
     public void rotate() {
+        shape = getRotatedShape();
+    }
+
+    // 回転後の形状を、shapeを変更せずに取得する
+    public int[][] getRotatedShape() {
         int rows = shape.length;
         int cols = shape[0].length;
         int[][] rotated = new int[cols][rows];
@@ -20,6 +25,6 @@ public class Tetromino {
             }
         }
 
-        shape = rotated;
+        return rotated;
     }
 }

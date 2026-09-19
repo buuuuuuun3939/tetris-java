@@ -111,7 +111,9 @@ class GamePanel extends JPanel implements KeyListener {
         }
 
         if (e.getKeyCode() == KeyEvent.VK_UP) {
-            tetromino.rotate();
+            if (canRotate()) {
+                tetromino.rotate();
+            }
         }
 
         repaint();
@@ -126,18 +128,29 @@ class GamePanel extends JPanel implements KeyListener {
     }
 
     private boolean canMoveDown() {
-        int nextRow = (blockY + Board.BLOCK_SIZE) / Board.BLOCK_SIZE;
-        int col = blockX / Board.BLOCK_SIZE;
+        int[][] shape = tetromino.getShape();
+        int currentRow = blockY / Board.BLOCK_SIZE;
+        int currentCol = blockX / Board.BLOCK_SIZE;
 
-        // Boardの一番下
-        if (nextRow >= Board.ROWS) {
-            return false;
-        }
+        for (int row = 0; row < shape.length; row++) {
+            for (int col = 0; col < shape[row].length; col++) {
 
-        // I字ミノの4マスを確認
-        for (int i = 0; i < 4; i++) {
-            if (board.getBlock(nextRow, col + i) == 1) {
-                return false;
+                if (shape[row][col] == 0) {
+                    continue;
+                }
+
+                int nextRow = currentRow + row + 1;
+                int boardCol = currentCol + col;
+
+                // 下端に到達した
+                if (nextRow >= Board.ROWS) {
+                    return false;
+                }
+
+                // 下のマスに固定ブロックがある
+                if (board.getBlock(nextRow, boardCol) == 1) {
+                    return false;
+                }
             }
         }
 
@@ -145,17 +158,30 @@ class GamePanel extends JPanel implements KeyListener {
     }
 
     private boolean canMoveLeft() {
-        int row = blockY / Board.BLOCK_SIZE;
-        int col = blockX / Board.BLOCK_SIZE;
+        int[][] shape = tetromino.getShape();
+        int currentRow = blockY / Board.BLOCK_SIZE;
+        int currentCol = blockX / Board.BLOCK_SIZE;
 
-        // Boardの左端
-        if (col <= 0) {
-            return false;
-        }
+        for (int row = 0; row < shape.length; row++) {
+            for (int col = 0; col < shape[row].length; col++) {
 
-        // I字ミノの左端を確認
-        if (board.getBlock(row, col - 1) == 1) {
-            return false;
+                if (shape[row][col] == 0) {
+                    continue;
+                }
+
+                int boardRow = currentRow + row;
+                int nextCol = currentCol + col - 1;
+
+                // Boardの左端に到達した
+                if (nextCol < 0) {
+                    return false;
+                }
+
+                // 左のマスに固定ブロックがある
+                if (board.getBlock(boardRow, nextCol) == 1) {
+                    return false;
+                }
+            }
         }
 
         return true;
@@ -163,20 +189,61 @@ class GamePanel extends JPanel implements KeyListener {
 
 
     private boolean canMoveRight() {
-        int row = blockY / Board.BLOCK_SIZE;
-        int col = blockX / Board.BLOCK_SIZE;
+        int[][] shape = tetromino.getShape();
+        int currentRow = blockY / Board.BLOCK_SIZE;
+        int currentCol = blockX / Board.BLOCK_SIZE;
 
-        // I字ミノの右端
-        int rightCol = col + 3;
+        for (int row = 0; row < shape.length; row++) {
+            for (int col = 0; col < shape[row].length; col++) {
 
-        // Boardの右端
-        if (rightCol >= Board.COLS - 1) {
-            return false;
+                if (shape[row][col] == 0) {
+                    continue;
+                }
+
+                int boardRow = currentRow + row;
+                int nextCol = currentCol + col + 1;
+
+                // Boardの右端に到達した
+                if (nextCol >= Board.COLS) {
+                    return false;
+                }
+
+                // 右のマスに固定ブロックがある
+                if (board.getBlock(boardRow, nextCol) == 1) {
+                    return false;
+                }
+            }
         }
 
-        // 右隣に固定ブロックがある
-        if (board.getBlock(row, rightCol + 1) == 1) {
-            return false;
+        return true;
+    }
+
+    private boolean canRotate() {
+        int[][] shape = tetromino.getRotatedShape();
+        int currentRow = blockY / Board.BLOCK_SIZE;
+        int currentCol = blockX / Board.BLOCK_SIZE;
+
+        for (int row = 0; row < shape.length; row++) {
+            for (int col = 0; col < shape[row].length; col++) {
+
+                if (shape[row][col] == 0) {
+                    continue;
+                }
+
+                int boardRow = currentRow + row;
+                int boardCol = currentCol + col;
+
+                // Boardの外に出る
+                if (boardRow < 0 || boardRow >= Board.ROWS
+                    || boardCol < 0 || boardCol >= Board.COLS) {
+                    return false;
+                }
+
+                // 回転先に固定ブロックがある
+                if (board.getBlock(boardRow, boardCol) == 1) {
+                    return false;
+                }
+            }
         }
 
         return true;
@@ -185,10 +252,14 @@ class GamePanel extends JPanel implements KeyListener {
     private void lockBlock() {
         int row = blockY / Board.BLOCK_SIZE;
         int col = blockX / Board.BLOCK_SIZE;
+        int[][] shape = tetromino.getShape();
 
-        board.setBlock(row, col);
-        board.setBlock(row, col + 1);
-        board.setBlock(row, col + 2);
-        board.setBlock(row, col + 3);
+        for (int r = 0; r < shape.length; r++) {
+            for (int c = 0; c < shape[r].length; c++) {
+                if (shape[r][c] == 1) {
+                    board.setBlock(row + r, col + c);
+                }
+            }
+        }
     }
 }
