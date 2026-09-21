@@ -68,44 +68,7 @@ class GamePanel extends JPanel implements KeyListener {
         super.paintComponent(g);
 
         // Boardを描画
-        for (int row = 0; row < Board.ROWS; row++) {
-            for (int col = 0; col < Board.COLS; col++) {
-
-                int x = col * Board.BLOCK_SIZE;
-                int y = row * Board.BLOCK_SIZE;
-
-                Color color = board.getBlock(row, col);
-
-                if (color != null) {
-                    // 固定ブロックをその色で描画
-                    g.setColor(color);
-                    g.fillRect(
-                        x,
-                        y,
-                        Board.BLOCK_SIZE,
-                        Board.BLOCK_SIZE
-                    );
-                } else {
-                    // 空いているマスは白で描画
-                    g.setColor(Color.WHITE);
-                    g.fillRect(
-                        x,
-                        y,
-                        Board.BLOCK_SIZE,
-                        Board.BLOCK_SIZE
-                    );
-
-                    // 空いているマスの格子を黒で描画
-                    g.setColor(Color.BLACK);
-                    g.drawRect(
-                        x,
-                        y,
-                        Board.BLOCK_SIZE - 1,
-                        Board.BLOCK_SIZE - 1
-                    );
-                }
-            }
-        }
+        drawBoard(g);
 
         int[][] shape = tetromino.getShape();
         g.setColor(tetromino.getColor());
@@ -377,6 +340,45 @@ class GamePanel extends JPanel implements KeyListener {
                     Board.BLOCK_SIZE,
                     Board.BLOCK_SIZE
                 );
+            }
+        }
+    }
+
+    private void drawBoard(Graphics g) {
+        for (int row = 0; row < Board.ROWS; row++) {
+            for (int col = 0; col < Board.COLS; col++) {
+
+                int x = col * Board.BLOCK_SIZE;
+                int y = row * Board.BLOCK_SIZE;
+                Color color = board.getBlock(row, col);
+
+                if (color != null) {
+                    // 固定されたブロック
+                    g.setColor(color);
+                    g.fillRect(
+                        x,
+                        y,
+                        Board.BLOCK_SIZE,
+                        Board.BLOCK_SIZE
+                    );
+                } else {
+                    // 空いているマス
+                    g.setColor(Color.WHITE);
+                    g.fillRect(
+                        x,
+                        y,
+                        Board.BLOCK_SIZE,
+                        Board.BLOCK_SIZE
+                    );
+
+                    g.setColor(Color.BLACK);
+                    g.drawRect(
+                        x,
+                        y,
+                        Board.BLOCK_SIZE - 1,
+                        Board.BLOCK_SIZE - 1
+                    );
+                }
             }
         }
     }
