@@ -392,8 +392,14 @@ class GamePanel extends JPanel implements KeyListener {
 
     private void drawGameOver(Graphics g) {
         if (gameOver) {
+            String message = "GAME OVER";
+            int textWidth = g.getFontMetrics().stringWidth(message);
+
+            int x = (Board.COLS * Board.BLOCK_SIZE - textWidth) / 2;
+            int y = Board.ROWS * Board.BLOCK_SIZE / 2;
+
             g.setColor(Color.BLACK);
-            g.drawString("GAME OVER", 100, 300);
+            g.drawString(message, x, y);
         }
     }
 }
