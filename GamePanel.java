@@ -58,6 +58,7 @@ class GamePanel extends JPanel implements KeyListener {
 
                 if (!canSpawn()) {
                     gameOver = true;
+                    paused = false;
                     bgmPlayer.stop();
                     timer.stop();
                 }
@@ -445,11 +446,11 @@ class GamePanel extends JPanel implements KeyListener {
     }
 
     private void restartGame() {
-
-        // 盤面を空にする
         board.clear();
+
         score = 0;
         gameOver = false;
+        paused = false;
 
         // ミノを作り直す
         tetromino = Tetromino.createRandom();
