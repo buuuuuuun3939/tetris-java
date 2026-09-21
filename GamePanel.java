@@ -71,12 +71,7 @@ class GamePanel extends JPanel implements KeyListener {
         drawCurrentTetromino(g);
         drawNextTetromino(g);
         drawScore(g);
-
-        // ゲームオーバーを描画
-        g.setColor(Color.BLACK);
-        if (gameOver) {
-            g.drawString("GAME OVER", 100, 300);
-        }
+        drawGameOver(g);
     }
 
     @Override
@@ -392,6 +387,13 @@ class GamePanel extends JPanel implements KeyListener {
                     Board.BLOCK_SIZE
                 );
             }
+        }
+    }
+
+    private void drawGameOver(Graphics g) {
+        if (gameOver) {
+            g.setColor(Color.BLACK);
+            g.drawString("GAME OVER", 100, 300);
         }
     }
 }
