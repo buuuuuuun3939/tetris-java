@@ -67,42 +67,16 @@ class GamePanel extends JPanel implements KeyListener {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
 
-        // Boardを描画
         drawBoard(g);
-
-        int[][] shape = tetromino.getShape();
-        g.setColor(tetromino.getColor());
-
-        // 現在のブロックを描画
-        for (int row = 0; row < shape.length; row++) {
-            for (int col = 0; col < shape[row].length; col++) {
-
-                if (shape[row][col] == 1) {
-                    int x = blockX + col * Board.BLOCK_SIZE;
-                    int y = blockY + row * Board.BLOCK_SIZE;
-
-                    g.fillRect(
-                        x,
-                        y,
-                        Board.BLOCK_SIZE,
-                        Board.BLOCK_SIZE
-                    );
-                }
-            }
-        }
+        drawCurrentTetromino(g);
+        drawNextTetromino(g);
 
         // スコアとゲームオーバーを描画
+        g.setColor(Color.BLACK);
         g.drawString("Score: " + score, 10, 20);
         if (gameOver) {
             g.drawString("GAME OVER", 100, 300);
         }
-
-        // 次のミノの表示のためのラベルを描画
-        g.setColor(Color.BLACK);
-        g.drawString("Next", Board.COLS * Board.BLOCK_SIZE + 20, 30);
-
-        // 次のミノを描画
-        drawNextTetromino(g);
     }
 
     @Override
@@ -322,6 +296,10 @@ class GamePanel extends JPanel implements KeyListener {
         int nextY = 50;
         int[][] shape = nextTetromino.getShape();
 
+        // 次のミノの表示のためのラベルを描画
+        g.setColor(Color.BLACK);
+        g.drawString("Next", Board.COLS * Board.BLOCK_SIZE + 20, 30);
+
         g.setColor(nextTetromino.getColor());
 
         for (int row = 0; row < shape.length; row++) {
@@ -379,6 +357,31 @@ class GamePanel extends JPanel implements KeyListener {
                         Board.BLOCK_SIZE - 1
                     );
                 }
+            }
+        }
+    }
+
+    public void drawCurrentTetromino(Graphics g) {
+        int[][] shape = tetromino.getShape();
+        g.setColor(tetromino.getColor());
+
+        // 現在のブロックを描画
+        for (int row = 0; row < shape.length; row++) {
+            for (int col = 0; col < shape[row].length; col++) {
+
+                if (shape[row][col] == 0) {
+                    continue;
+                }
+
+                int x = blockX + col * Board.BLOCK_SIZE;
+                int y = blockY + row * Board.BLOCK_SIZE;
+
+                g.fillRect(
+                    x,
+                    y,
+                    Board.BLOCK_SIZE,
+                    Board.BLOCK_SIZE
+                );
             }
         }
     }
