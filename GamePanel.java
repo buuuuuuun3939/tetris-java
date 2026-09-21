@@ -1,3 +1,4 @@
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.event.KeyEvent;
@@ -71,28 +72,43 @@ class GamePanel extends JPanel implements KeyListener {
                 int x = col * Board.BLOCK_SIZE;
                 int y = row * Board.BLOCK_SIZE;
 
-                // マス目
-                g.drawRect(
-                    x,
-                    y,
-                    Board.BLOCK_SIZE - 1,
-                    Board.BLOCK_SIZE - 1
-                );
+                Color color = board.getBlock(row, col);
 
-                // 固定されたブロック
-                if (board.getBlock(row, col) == 1) {
+                if (color != null) {
+                    // 固定ブロックをその色で描画
+                    g.setColor(color);
                     g.fillRect(
-                    x,
-                    y,
-                    Board.BLOCK_SIZE,
-                    Board.BLOCK_SIZE
-                );}
+                        x,
+                        y,
+                        Board.BLOCK_SIZE,
+                        Board.BLOCK_SIZE
+                    );
+                } else {
+                    // 空いているマスは白で描画
+                    g.setColor(Color.WHITE);
+                    g.fillRect(
+                        x,
+                        y,
+                        Board.BLOCK_SIZE,
+                        Board.BLOCK_SIZE
+                    );
+
+                    // 空いているマスの格子を黒で描画
+                    g.setColor(Color.BLACK);
+                    g.drawRect(
+                        x,
+                        y,
+                        Board.BLOCK_SIZE - 1,
+                        Board.BLOCK_SIZE - 1
+                    );
+                }
             }
         }
 
         int[][] shape = tetromino.getShape();
         g.setColor(tetromino.getColor());
 
+        // 現在のブロックを描画
         for (int row = 0; row < shape.length; row++) {
             for (int col = 0; col < shape[row].length; col++) {
 
@@ -173,7 +189,7 @@ class GamePanel extends JPanel implements KeyListener {
                 }
 
                 // 下のマスに固定ブロックがある
-                if (board.getBlock(nextRow, boardCol) == 1) {
+                if (board.getBlock(nextRow, boardCol) != null) {
                     return false;
                 }
             }
@@ -203,7 +219,7 @@ class GamePanel extends JPanel implements KeyListener {
                 }
 
                 // 左のマスに固定ブロックがある
-                if (board.getBlock(boardRow, nextCol) == 1) {
+                if (board.getBlock(boardRow, nextCol) != null) {
                     return false;
                 }
             }
@@ -234,7 +250,7 @@ class GamePanel extends JPanel implements KeyListener {
                 }
 
                 // 右のマスに固定ブロックがある
-                if (board.getBlock(boardRow, nextCol) == 1) {
+                if (board.getBlock(boardRow, nextCol) != null) {
                     return false;
                 }
             }
@@ -265,7 +281,7 @@ class GamePanel extends JPanel implements KeyListener {
                 }
 
                 // 回転先に固定ブロックがある
-                if (board.getBlock(boardRow, boardCol) == 1) {
+                if (board.getBlock(boardRow, boardCol) != null) {
                     return false;
                 }
             }
@@ -282,7 +298,7 @@ class GamePanel extends JPanel implements KeyListener {
         for (int r = 0; r < shape.length; r++) {
             for (int c = 0; c < shape[r].length; c++) {
                 if (shape[r][c] == 1) {
-                    board.setBlock(currentRow + r, currentCol + c);
+                    board.setBlock(currentRow + r, currentCol + c ,tetromino.getColor());
                 }
             }
         }
@@ -312,7 +328,7 @@ class GamePanel extends JPanel implements KeyListener {
                     return false;
                 }
 
-                if (board.getBlock(boardRow, boardCol) == 1) {
+                if (board.getBlock(boardRow, boardCol) != null) {
                     return false;
                 }
             }

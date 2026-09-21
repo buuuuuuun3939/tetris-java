@@ -1,9 +1,11 @@
+import java.awt.Color;
+
 public class Board {
     public static final int ROWS = 20;
     public static final int COLS = 10;
     public static final int BLOCK_SIZE = 30;
 
-    private int[][] board = new int[ROWS][COLS];
+    private Color[][] board = new Color[ROWS][COLS];
 
     public static int getWidth() {
         return COLS * BLOCK_SIZE;
@@ -13,17 +15,17 @@ public class Board {
         return ROWS * BLOCK_SIZE;
     }
 
-    public void setBlock(int row, int col) {
-        board[row][col] = 1;
+    public void setBlock(int row, int col, Color color) {
+        board[row][col] = color;
     }
 
-    public int getBlock(int row, int col) {
+    public Color getBlock(int row, int col) {
         return board[row][col];
     }
 
     public boolean isRowFull(int row) {
         for (int col = 0; col < COLS; col++) {
-            if (board[row][col] == 0) {
+            if (board[row][col] == null) {
                 return false;
             }
         }
@@ -41,7 +43,7 @@ public class Board {
 
         // 一行空にする
         for (int col = 0; col < COLS; col++) {
-            board[0][col] = 0;
+            board[0][col] = null;
         }
     }
 
