@@ -23,9 +23,13 @@ class GamePanel extends JPanel implements KeyListener {
     private Timer timer;
     private Tetromino tetromino;
     private Tetromino nextTetromino;
+    private BgmPlayer bgmPlayer;
 
     public GamePanel() {
         board = new Board();
+        bgmPlayer = new BgmPlayer();
+        bgmPlayer.play();
+
         tetromino = Tetromino.createRandom();
         nextTetromino = Tetromino.createRandom();
         spawnTetromino();
@@ -53,6 +57,7 @@ class GamePanel extends JPanel implements KeyListener {
 
                 if (!canSpawn()) {
                     gameOver = true;
+                    bgmPlayer.stop();
                     timer.stop();
                 }
             }
