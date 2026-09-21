@@ -139,28 +139,7 @@ class GamePanel extends JPanel implements KeyListener {
         g.drawString("Next", Board.COLS * Board.BLOCK_SIZE + 20, 30);
 
         // 次のミノを描画
-        int[][] nextShape = nextTetromino.getShape();
-        int nextX = Board.COLS * Board.BLOCK_SIZE + 20;
-        int nextY = 50;
-
-        g.setColor(nextTetromino.getColor());
-
-        for (int row = 0; row < nextShape.length; row++) {
-            for (int col = 0; col < nextShape[row].length; col++) {
-
-                if (nextShape[row][col] == 1) {
-                    int x = nextX + col * Board.BLOCK_SIZE;
-                    int y = nextY + row * Board.BLOCK_SIZE;
-
-                    g.fillRect(
-                        x,
-                        y,
-                        Board.BLOCK_SIZE,
-                        Board.BLOCK_SIZE
-                    );
-                }
-            }
-        }
+        drawNextTetromino(g);
     }
 
     @Override
@@ -373,5 +352,32 @@ class GamePanel extends JPanel implements KeyListener {
 
         tetromino = nextTetromino;
         nextTetromino = Tetromino.createRandom();
+    }
+
+    private void drawNextTetromino(Graphics g) {
+        int nextX = Board.COLS * Board.BLOCK_SIZE + 30;
+        int nextY = 50;
+        int[][] shape = nextTetromino.getShape();
+
+        g.setColor(nextTetromino.getColor());
+
+        for (int row = 0; row < shape.length; row++) {
+            for (int col = 0; col < shape[row].length; col++) {
+
+                if (shape[row][col] == 0) {
+                    continue;
+                }
+
+                int x = nextX + col * Board.BLOCK_SIZE;
+                int y = nextY + row * Board.BLOCK_SIZE;
+
+                g.fillRect(
+                    x,
+                    y,
+                    Board.BLOCK_SIZE,
+                    Board.BLOCK_SIZE
+                );
+            }
+        }
     }
 }
