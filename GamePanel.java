@@ -70,10 +70,10 @@ class GamePanel extends JPanel implements KeyListener {
         drawBoard(g);
         drawCurrentTetromino(g);
         drawNextTetromino(g);
+        drawScore(g);
 
-        // スコアとゲームオーバーを描画
+        // ゲームオーバーを描画
         g.setColor(Color.BLACK);
-        g.drawString("Score: " + score, 10, 20);
         if (gameOver) {
             g.drawString("GAME OVER", 100, 300);
         }
@@ -275,6 +275,15 @@ class GamePanel extends JPanel implements KeyListener {
         }
     }
 
+    private void drawScore(Graphics g) {
+        int x = Board.COLS * Board.BLOCK_SIZE + 20;
+        int y = 30;
+
+        g.setColor(Color.BLACK);
+        g.drawString("SCORE", x, y);
+        g.drawString(String.valueOf(score), x, y + 25);
+    }
+
     private void lockBlock() {
         int currentRow = blockY / Board.BLOCK_SIZE;
         int currentCol = blockX / Board.BLOCK_SIZE;
@@ -332,12 +341,12 @@ class GamePanel extends JPanel implements KeyListener {
 
     private void drawNextTetromino(Graphics g) {
         int nextX = Board.COLS * Board.BLOCK_SIZE + 30;
-        int nextY = 50;
+        int nextY = 150;
         int[][] shape = nextTetromino.getShape();
 
         // 次のミノの表示のためのラベルを描画
         g.setColor(Color.BLACK);
-        g.drawString("Next", Board.COLS * Board.BLOCK_SIZE + 20, 30);
+        g.drawString("Next", Board.COLS * Board.BLOCK_SIZE + 20, 100);
 
         g.setColor(nextTetromino.getColor());
 
