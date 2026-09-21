@@ -44,6 +44,10 @@ class GamePanel extends JPanel implements KeyListener {
 
         // 500ミリ秒ごとに処理する
         timer = new Timer(500, e -> {
+            if (gameState != GameState.PLAYING) {
+                return;
+            }
+
             if (canMoveDown()) {
                 blockY += BLOCK_SIZE;
             } else {
