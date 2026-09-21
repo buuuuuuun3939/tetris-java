@@ -17,8 +17,7 @@ class GamePanel extends JPanel implements KeyListener {
     private final int PANEL_HEIGHT = 600;
     private static final int SPAWN_ROW = 0;
     private static final int SPAWN_COL = 3;
-    private boolean gameOver = false;
-    private boolean paused = false;
+    private GameState gameState = GameState.PLAYING;
 
     private Board board;
     private Timer timer;
@@ -57,10 +56,9 @@ class GamePanel extends JPanel implements KeyListener {
                 spawnTetromino();
 
                 if (!canSpawn()) {
-                    gameOver = true;
-                    paused = false;
-                    bgmPlayer.stop();
+                    gameState = GameState.GAME_OVER;
                     timer.stop();
+                    bgmPlayer.stop();
                 }
             }
 
@@ -108,17 +106,21 @@ class GamePanel extends JPanel implements KeyListener {
             }
         }
 
-        if (e.getKeyCode() == KeyEvent.VK_R && gameOver) {
+        if (e.getKeyCode() == KeyEvent.VK_R
+                && gameState == GameState.GAME_OVER ) {
             restartGame();
         }
 
-        if (e.getKeyCode() == KeyEvent.VK_P && !gameOver) {
-            if (paused) {
-                paused = false;
+        if (e.getKeyCode() == KeyEvent.VK_P
+                && gameState != GameState.GAME_OVER) {
+            if (gameState == GameState.PAUSED) {
+                gameState = GameState.PLAYING;
+
                 timer.start();
                 bgmPlayer.play();
             } else {
-                paused = true;
+                gameState = GameState.PAUSED;
+
                 timer.stop();
                 bgmPlayer.stop();
             }
@@ -419,7 +421,7 @@ class GamePanel extends JPanel implements KeyListener {
     }
 
     private void drawGameOver(Graphics g) {
-        if (gameOver) {
+        if (gameState == GameState.GAME_OVER) {
             String message = "GAME OVER";
             int textWidth = g.getFontMetrics().stringWidth(message);
 
@@ -432,7 +434,7 @@ class GamePanel extends JPanel implements KeyListener {
     }
 
     private void drawPaused(Graphics g) {
-        if (paused) {
+        if (gameState == GameState.PAUSED) {
             String message = "PAUSED";
 
             int textWidth = g.getFontMetrics().stringWidth(message);
@@ -449,8 +451,7 @@ class GamePanel extends JPanel implements KeyListener {
         board.clear();
 
         score = 0;
-        gameOver = false;
-        paused = false;
+        gameState = GameState.PLAYING;
 
         // ミノを作り直す
         tetromino = Tetromino.createRandom();
