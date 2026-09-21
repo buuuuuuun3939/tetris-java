@@ -93,6 +93,12 @@ class GamePanel extends JPanel implements KeyListener {
             }
         }
 
+        if (e.getKeyCode() == KeyEvent.VK_DOWN) {
+            if (canMoveDown()) {
+                blockY += Board.BLOCK_SIZE;
+            }
+        }
+
         if (e.getKeyCode() == KeyEvent.VK_UP) {
             if (canRotate()) {
                 tetromino.rotate();
