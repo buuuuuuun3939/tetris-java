@@ -81,10 +81,6 @@ class GamePanel extends JPanel implements KeyListener {
 
     @Override
     public void keyPressed(KeyEvent e) {
-        if (gameOver) {
-            return;
-        }
-
         if (e.getKeyCode() == KeyEvent.VK_LEFT) {
             if (canMoveLeft()) {
                 blockX -= Board.BLOCK_SIZE;
@@ -101,6 +97,10 @@ class GamePanel extends JPanel implements KeyListener {
             if (canRotate()) {
                 tetromino.rotate();
             }
+        }
+
+        if (e.getKeyCode() == KeyEvent.VK_R && gameOver) {
+            restartGame();
         }
 
         repaint();
@@ -406,5 +406,27 @@ class GamePanel extends JPanel implements KeyListener {
             g.setColor(Color.BLACK);
             g.drawString(message, x, y);
         }
+    }
+
+    private void restartGame() {
+
+        // 盤面を空にする
+        board.clear();
+        score = 0;
+        gameOver = false;
+
+        // ミノを作り直す
+        tetromino = Tetromino.createRandom();
+        nextTetromino = Tetromino.createRandom();
+
+        // ミノの位置を初期位置に戻す
+        blockX = SPAWN_COL * Board.BLOCK_SIZE;
+        blockY = SPAWN_ROW * Board.BLOCK_SIZE;
+
+        bgmPlayer.play();
+        timer.start();
+
+        // 画面を更新
+        repaint();
     }
 }
