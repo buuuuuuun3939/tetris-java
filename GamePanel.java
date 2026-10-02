@@ -128,6 +128,11 @@ class GamePanel extends JPanel implements KeyListener {
             }
         }
 
+        if (e.getKeyCode() == KeyEvent.VK_SPACE) {
+            hardDrop();
+            return;
+        }
+
         repaint();
     }
 
@@ -390,6 +395,21 @@ class GamePanel extends JPanel implements KeyListener {
 
         tetromino = nextTetromino;
         nextTetromino = Tetromino.createRandom();
+    }
+
+    private void hardDrop() {
+        while (canMoveDown()) {
+            blockY += Board.BLOCK_SIZE;
+        }
+        lockBlock();
+        score += board.clearFullRows() * 100;
+
+        spawnTetromino();
+        if (!canSpawn()) {
+            setGameOver();
+        }
+
+        repaint();
     }
 
     private void drawNextTetromino(Graphics g) {
