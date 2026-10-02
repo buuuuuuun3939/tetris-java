@@ -52,7 +52,7 @@ class GamePanel extends JPanel implements KeyListener {
                 blockY += BLOCK_SIZE;
             } else {
                 lockBlock();
-                score += board.clearFullRows() * 100;
+                addScore(board.clearFullRows()); // 一行消せてない場合は0が返るので、スコアは加算されない
 
                 blockX = 90;
                 blockY = 0;
@@ -333,6 +333,10 @@ class GamePanel extends JPanel implements KeyListener {
         }
     }
 
+    private void addScore(int clearedRows) {
+        score += clearedRows * 100;
+    }
+
     private void drawScore(Graphics g) {
         int x = Board.COLS * Board.BLOCK_SIZE + 20;
         int y = 30;
@@ -402,7 +406,7 @@ class GamePanel extends JPanel implements KeyListener {
             blockY += Board.BLOCK_SIZE;
         }
         lockBlock();
-        score += board.clearFullRows() * 100;
+        addScore(board.clearFullRows());
 
         spawnTetromino();
         if (!canSpawn()) {
