@@ -261,17 +261,17 @@ class GamePanel extends JPanel implements KeyListener {
         return true;
     }
 
-    private void togglePause() {
-        if (gameState == GameState.PAUSED) {
-            gameState = GameState.PLAYING;
-            timer.start();
-            bgmPlayer.play();
-        } else if (gameState == GameState.PLAYING) {
-            gameState = GameState.PAUSED;
-            timer.stop();
-            bgmPlayer.stop();
-        }
+    private void startGame() {
+        gameState = GameState.PLAYING;
+        timer.start();
+        bgmPlayer.play();
+        repaint();
+    }
 
+    private void stopGame() {
+        gameState = GameState.PAUSED;
+        timer.stop();
+        bgmPlayer.stop();
         repaint();
     }
 
@@ -279,6 +279,14 @@ class GamePanel extends JPanel implements KeyListener {
         gameState = GameState.GAME_OVER;
         timer.stop();
         bgmPlayer.stop();
+    }
+
+    private void togglePause() {
+        if (gameState == GameState.PAUSED) {
+            startGame();
+        } else if (gameState == GameState.PLAYING) {
+            stopGame();
+        }
     }
 
     private void drawBoard(Graphics g) {
@@ -471,7 +479,6 @@ class GamePanel extends JPanel implements KeyListener {
         board.clear();
 
         score = 0;
-        gameState = GameState.PLAYING;
 
         // ミノを作り直す
         tetromino = Tetromino.createRandom();
@@ -481,10 +488,6 @@ class GamePanel extends JPanel implements KeyListener {
         blockX = SPAWN_COL * Board.BLOCK_SIZE;
         blockY = SPAWN_ROW * Board.BLOCK_SIZE;
 
-        bgmPlayer.play();
-        timer.start();
-
-        // 画面を更新
-        repaint();
+        startGame();
     }
 }
