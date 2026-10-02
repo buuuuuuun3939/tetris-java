@@ -36,7 +36,7 @@ class GamePanel extends JPanel implements KeyListener {
         spawnTetromino();
 
         setPreferredSize(new Dimension(
-            Board.COLS * Board.BLOCK_SIZE + 150,
+            Board.COLS * Board.BLOCK_SIZE + 200,
             Board.ROWS * Board.BLOCK_SIZE
         ));
 
@@ -427,9 +427,27 @@ class GamePanel extends JPanel implements KeyListener {
     }
 
     private void drawNextTetromino(Graphics g) {
-        int nextX = Board.COLS * Board.BLOCK_SIZE + 30;
+        int nextX;
         int nextY = 250;
         int[][] shape = nextTetromino.getShape();
+        int minCol = shape[0].length;
+        int maxCol = -1;
+
+        for (int[] row : shape) {
+            for (int col = 0; col < row.length; col++) {
+                if (row[col] != 0) {
+                    minCol = Math.min(minCol, col);
+                    maxCol = Math.max(maxCol, col);
+                }
+            }
+        }
+
+        int boardWidth = Board.getWidth();
+        int sidePanelWidth = getWidth() - boardWidth;
+        int pieceWidth = (maxCol - minCol + 1) * Board.BLOCK_SIZE;
+        // ミノを中央に配置するためのX座標を計算. nextX = 右側領域の左端 + 右側領域内の中央寄せ余白 - shape左端の空列分
+        nextX = boardWidth + (sidePanelWidth - pieceWidth) / 2 - minCol * Board.BLOCK_SIZE;
+
 
         // 次のミノの表示のためのラベルを描画
         g.setColor(Color.BLACK);
