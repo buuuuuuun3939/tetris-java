@@ -125,9 +125,7 @@ class GamePanel extends JPanel implements KeyListener {
         }
 
         if (e.getKeyCode() == KeyEvent.VK_UP) {
-            if (canRotate()) {
-                tetromino.rotate();
-            }
+            tryRotate();
         }
 
         if (e.getKeyCode() == KeyEvent.VK_SPACE) {
@@ -266,6 +264,44 @@ class GamePanel extends JPanel implements KeyListener {
         }
 
         return true;
+    }
+
+    private void tryRotate() {
+        // そのまま回転できるか試す
+        if (canRotate()) {
+            tetromino.rotate();
+            repaint();
+
+            return;
+        }
+
+        // 以下、左端に寄っている場合の処理
+        // 1マス右にずらして回転できるか試す
+        blockX += Board.BLOCK_SIZE;
+        if (canRotate()) {
+            tetromino.rotate();
+            repaint();
+
+            return;
+        }
+
+        // 回転できなかったので元の位置に戻す
+        blockX -= Board.BLOCK_SIZE;
+        // ===========================
+
+        // 以下、右端に寄っている場合の処理
+        // 1マス左にずらして回転できるか試す
+        blockX -= Board.BLOCK_SIZE;
+        if (canRotate()) {
+            tetromino.rotate();
+            repaint();
+
+            return;
+        }
+
+        // 回転できなかったので元の位置に戻す
+        blockX += Board.BLOCK_SIZE;
+        // ===========================
     }
 
     private int getDropInterval() {
