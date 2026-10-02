@@ -268,6 +268,10 @@ class GamePanel extends JPanel implements KeyListener {
         return true;
     }
 
+    private int getDropInterval() {
+       return Math.max(100, 500 - (level - 1) * 50);
+    }
+
     private void startGame() {
         gameState = GameState.PLAYING;
         timer.start();
@@ -353,6 +357,7 @@ class GamePanel extends JPanel implements KeyListener {
 
     private void updateLevel() {
         level = score / 1000 + 1;
+        timer.setDelay(getDropInterval());  // レベルに応じて落下速度を変更
     }
 
     private void lockBlock() {
