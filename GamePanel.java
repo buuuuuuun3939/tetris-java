@@ -60,9 +60,7 @@ class GamePanel extends JPanel implements KeyListener {
                 spawnTetromino();
 
                 if (!canSpawn()) {
-                    gameState = GameState.GAME_OVER;
-                    timer.stop();
-                    bgmPlayer.stop();
+                    setGameOver();
                 }
             }
 
@@ -86,6 +84,26 @@ class GamePanel extends JPanel implements KeyListener {
 
     @Override
     public void keyPressed(KeyEvent e) {
+        // GAME_OVER中はRキーでリスタートできるようにする
+        if (e.getKeyCode() == KeyEvent.VK_R
+                && gameState == GameState.GAME_OVER) {
+            restartGame();
+            return;
+        }
+
+        // Pキーで一時停止・再開
+        if (e.getKeyCode() == KeyEvent.VK_P
+                && gameState != GameState.GAME_OVER) {
+            togglePause();
+            return;
+        }
+
+        // PLAYING中以外は通常操作を受け付けない
+        if (gameState != GameState.PLAYING) {
+            return;
+        }
+
+
         if (e.getKeyCode() == KeyEvent.VK_LEFT) {
             if (canMoveLeft()) {
                 blockX -= Board.BLOCK_SIZE;
@@ -108,28 +126,6 @@ class GamePanel extends JPanel implements KeyListener {
             if (canRotate()) {
                 tetromino.rotate();
             }
-        }
-
-        if (e.getKeyCode() == KeyEvent.VK_R
-                && gameState == GameState.GAME_OVER ) {
-            restartGame();
-        }
-
-        if (e.getKeyCode() == KeyEvent.VK_P
-                && gameState != GameState.GAME_OVER) {
-            if (gameState == GameState.PAUSED) {
-                gameState = GameState.PLAYING;
-
-                timer.start();
-                bgmPlayer.play();
-            } else {
-                gameState = GameState.PAUSED;
-
-                timer.stop();
-                bgmPlayer.stop();
-            }
-
-            repaint();
         }
 
         repaint();
@@ -263,6 +259,26 @@ class GamePanel extends JPanel implements KeyListener {
         }
 
         return true;
+    }
+
+    private void togglePause() {
+        if (gameState == GameState.PAUSED) {
+            gameState = GameState.PLAYING;
+            timer.start();
+            bgmPlayer.play();
+        } else if (gameState == GameState.PLAYING) {
+            gameState = GameState.PAUSED;
+            timer.stop();
+            bgmPlayer.stop();
+        }
+
+        repaint();
+    }
+
+    private void setGameOver() {
+        gameState = GameState.GAME_OVER;
+        timer.stop();
+        bgmPlayer.stop();
     }
 
     private void drawBoard(Graphics g) {
