@@ -18,12 +18,22 @@ class GamePanel extends JPanel implements KeyListener {
     private final int PANEL_HEIGHT = 600;
     private static final int SPAWN_ROW = 0;
     private static final int SPAWN_COL = 3;
+    private boolean holdUsed = false;
     private GameState gameState = GameState.PLAYING;
+
+    private static final int UI_X =
+        Board.COLS * Board.BLOCK_SIZE + 30;
+
+    private static final int SCORE_Y = 50;
+    private static final int LEVEL_Y = 130;
+    private static final int NEXT_Y = 210;
+    private static final int HOLD_Y = 600;
 
     private Board board;
     private Timer timer;
     private Tetromino tetromino;
     private Tetromino nextTetromino;
+    private Tetromino holdTetromino;
     private BgmPlayer bgmPlayer;
 
     public GamePanel() {
@@ -71,6 +81,7 @@ class GamePanel extends JPanel implements KeyListener {
         drawBoard(g);
         drawCurrentTetromino(g);
         drawNextTetromino(g);
+        //drawHoldTetromino(g);
         drawScore(g);
         drawGameOver(g);
         drawPaused(g);
@@ -78,6 +89,12 @@ class GamePanel extends JPanel implements KeyListener {
 
     @Override
     public void keyPressed(KeyEvent e) {
+        // if (e.getKeyCode() == KeyEvent.VK_C) {
+        //     hold();
+        //     repaint();
+        //     return;
+        // }
+
         // GAME_OVER中はRキーでリスタートできるようにする
         if (e.getKeyCode() == KeyEvent.VK_R
                 && gameState == GameState.GAME_OVER) {
@@ -369,15 +386,13 @@ class GamePanel extends JPanel implements KeyListener {
     }
 
     private void drawScore(Graphics g) {
-        int x = Board.COLS * Board.BLOCK_SIZE + 20;
-        int y = 30;
 
         g.setColor(Color.BLACK);
-        g.drawString("SCORE", x, y);
-        g.drawString(String.valueOf(score), x, y + 25);
+        g.drawString("SCORE", UI_X, SCORE_Y);
+        g.drawString(String.valueOf(score), UI_X, SCORE_Y + 25);
 
-        g.drawString("LEVEL", x, y + 60);
-        g.drawString(String.valueOf(level), x, y + 85);
+        g.drawString("LEVEL", UI_X, LEVEL_Y);
+        g.drawString(String.valueOf(level), UI_X, LEVEL_Y + 25);
     }
 
     private void updateLevel() {
@@ -448,10 +463,12 @@ class GamePanel extends JPanel implements KeyListener {
         updateLevel();
 
         spawnTetromino();
+        holdUsed = false;
 
         if (!canSpawn()) {
             setGameOver();
         }
+
     }
 
     private void hardDrop() {
@@ -463,10 +480,31 @@ class GamePanel extends JPanel implements KeyListener {
         repaint();
     }
 
-    private void drawNextTetromino(Graphics g) {
-        int nextX;
-        int nextY = 250;
-        int[][] shape = nextTetromino.getShape();
+    // private void hold() {
+    //     // すでにHOLDしていたら何もしない
+    //     if (holdUsed) {
+    //         return;
+    //     }
+
+    //     // HOLDが空の場合
+    //     if (holdTetromino == null) {
+    //         holdTetromino = tetromino;
+    //         spawnTetromino();
+    //     } else {
+    //         // HOLDと現在のミノを交換
+    //         Tetromino temp = holdTetromino;
+    //         holdTetromino = tetromino;
+    //         tetromino = temp;
+
+    //         blockX = SPAWN_COL * Board.BLOCK_SIZE;
+    //         blockY = SPAWN_ROW * Board.BLOCK_SIZE;
+    //     }
+
+    //     holdUsed = true;
+    // }
+
+    // 盤面外でミノの形状を中央に配置するためのオフセットを計算する
+    private int calcTetrominoCenteringOffset(int[][] shape) {
         int minCol = shape[0].length;
         int maxCol = -1;
 
@@ -479,16 +517,44 @@ class GamePanel extends JPanel implements KeyListener {
             }
         }
 
-        int boardWidth = Board.getWidth();
-        int sidePanelWidth = getWidth() - boardWidth;
         int pieceWidth = (maxCol - minCol + 1) * Board.BLOCK_SIZE;
-        // ミノを中央に配置するためのX座標を計算. nextX = 右側領域の左端 + 右側領域内の中央寄せ余白 - shape左端の空列分
-        nextX = boardWidth + (sidePanelWidth - pieceWidth) / 2 - minCol * Board.BLOCK_SIZE;
+        int sidePanelWidth = getWidth() - Board.getWidth();
+        int offsetX = (sidePanelWidth - pieceWidth) / 2 - minCol * Board.BLOCK_SIZE;
 
+        // offsetXを使用してミノを中央に配置する処理を行う
+
+        return offsetX + Board.getWidth(); // 右側領域の左端からのオフセットを返す
+    }
+
+    private void drawNextTetromino(Graphics g) {
+        int[][] shape = nextTetromino.getShape();
+        //int nextX = UI_X;
+        int nextX = calcTetrominoCenteringOffset(shape);
+        int nextY = NEXT_Y;
+        //int[][] shape = nextTetromino.getShape();
+        // int minCol = shape[0].length;
+        // int maxCol = -1;
+
+        // for (int[] row : shape) {
+        //     for (int col = 0; col < row.length; col++) {
+        //         if (row[col] != 0) {
+        //             minCol = Math.min(minCol, col);
+        //             maxCol = Math.max(maxCol, col);
+        //         }
+        //     }
+        // }
+
+        // int boardWidth = Board.getWidth();
+        // int sidePanelWidth = getWidth() - boardWidth;
+        // int pieceWidth = (maxCol - minCol + 1) * Board.BLOCK_SIZE;
+        // // ミノを中央に配置するためのX座標を計算. nextX = 右側領域の左端 + 右側領域内の中央寄せ余白 - shape左端の空列分
+        // nextX = boardWidth + (sidePanelWidth - pieceWidth) / 2 - minCol * Board.BLOCK_SIZE;
+
+        //calcTetrominoCenteringOffset(shape);
 
         // 次のミノの表示のためのラベルを描画
         g.setColor(Color.BLACK);
-        g.drawString("Next", Board.COLS * Board.BLOCK_SIZE + 20, 200);
+        g.drawString("Next", UI_X, NEXT_Y - 10);
 
         g.setColor(nextTetromino.getColor());
 
@@ -562,6 +628,41 @@ class GamePanel extends JPanel implements KeyListener {
             g.setColor(Color.BLACK);
             g.drawString(message, x, y);
         }
+    }
+
+    private void drawHoldTetromino(Graphics g) {
+        // if (holdTetromino == null) {
+        //     return;
+        // }
+
+        int[][] shape = holdTetromino.getShape();
+        // int x = calcTetrominoCenteringOffset(shape);
+        int x = 500;
+        int y = HOLD_Y;
+
+        g.setColor(Color.BLACK);
+        g.drawString("HOLD", 30, y);
+
+        // int startX = x;
+        // int startY = y + 20;
+
+        // g.setColor(holdTetromino.getColor());
+
+        // for (int row = 0; row < shape.length; row++) {
+        //     for (int col = 0; col < shape[row].length; col++) {
+
+        //         if (shape[row][col] == 0) {
+        //             continue;
+        //         }
+
+        //         g.fillRect(
+        //             startX + col * Board.BLOCK_SIZE,
+        //             startY + row * Board.BLOCK_SIZE,
+        //             Board.BLOCK_SIZE,
+        //             Board.BLOCK_SIZE
+        //         );
+        //     }
+        // }
     }
 
     private void restartGame() {
