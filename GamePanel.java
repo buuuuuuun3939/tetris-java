@@ -81,6 +81,7 @@ class GamePanel extends JPanel implements KeyListener {
         super.paintComponent(g);
 
         drawBoard(g);
+        drawGhostTetromino(g);  // 現在のミノよりもゴーストのミノを先に描画する
         drawCurrentTetromino(g);
         drawNextTetromino(g);
         drawHoldTetromino(g);
@@ -156,33 +157,7 @@ class GamePanel extends JPanel implements KeyListener {
     }
 
     private boolean canMoveDown() {
-        int[][] shape = tetromino.getShape();
-        int currentRow = blockY / Board.BLOCK_SIZE;
-        int currentCol = blockX / Board.BLOCK_SIZE;
-
-        for (int row = 0; row < shape.length; row++) {
-            for (int col = 0; col < shape[row].length; col++) {
-
-                if (shape[row][col] == 0) {
-                    continue;
-                }
-
-                int nextRow = currentRow + row + 1;
-                int boardCol = currentCol + col;
-
-                // 下端に到達した
-                if (nextRow >= Board.ROWS) {
-                    return false;
-                }
-
-                // 下のマスに固定ブロックがある
-                if (board.getBlock(nextRow, boardCol) != null) {
-                    return false;
-                }
-            }
-        }
-
-        return true;
+        return canMoveDownAt(blockY);
     }
 
     private boolean canMoveLeft() {
@@ -533,6 +508,34 @@ class GamePanel extends JPanel implements KeyListener {
         return offsetX + Board.getWidth(); // 右側領域の左端からのオフセットを返す
     }
 
+    private void drawGhostTetromino(Graphics g) {
+        int ghostY = getGhostY();
+        int[][] shape = tetromino.getShape();
+        int currentRow = ghostY / Board.BLOCK_SIZE;
+        int currentCol = blockX / Board.BLOCK_SIZE;
+
+        g.setColor(Color.LIGHT_GRAY);
+
+        for (int row = 0; row < shape.length; row++) {
+            for (int col = 0; col < shape[row].length; col++) {
+
+                if (shape[row][col] == 0) {
+                    continue;
+                }
+
+                int x = (currentCol + col) * Board.BLOCK_SIZE;
+                int y = (currentRow + row) * Board.BLOCK_SIZE;
+
+                g.drawRect(
+                    x,
+                    y,
+                    Board.BLOCK_SIZE - 1,
+                    Board.BLOCK_SIZE - 1
+                );
+            }
+        }
+    }
+
     private void drawNextTetromino(Graphics g) {
         // 次のミノの表示のためのラベルを描画
         g.setColor(Color.BLACK);
@@ -663,5 +666,45 @@ class GamePanel extends JPanel implements KeyListener {
         blockY = SPAWN_ROW * Board.BLOCK_SIZE;
 
         startGame();
+    }
+
+    private int getGhostY() {
+        int ghostY = blockY;
+
+        while (canMoveDownAt(ghostY)) {
+            ghostY += Board.BLOCK_SIZE;
+        }
+
+        return ghostY;
+    }
+
+    private boolean canMoveDownAt(int testY) {
+
+        int[][] shape = tetromino.getShape();
+
+        int currentRow = testY / Board.BLOCK_SIZE;
+        int currentCol = blockX / Board.BLOCK_SIZE;
+
+        for (int row = 0; row < shape.length; row++) {
+            for (int col = 0; col < shape[row].length; col++) {
+
+                if (shape[row][col] == 0) {
+                    continue;
+                }
+
+                int nextRow = currentRow + row + 1;
+                int boardCol = currentCol + col;
+
+                if (nextRow >= Board.ROWS) {
+                    return false;
+                }
+
+                if (board.getBlock(nextRow, boardCol) != null) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 }
