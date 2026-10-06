@@ -504,6 +504,10 @@ class GamePanel extends JPanel implements KeyListener {
         }
 
         holdUsed = true;
+
+        if (!canSpawn()) {
+            setGameOver();
+        }
     }
 
     // 盤面外でミノの形状を中央に配置するためのオフセットを計算する
