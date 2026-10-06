@@ -20,6 +20,7 @@ class GamePanel extends JPanel implements KeyListener {
     private static final int SPAWN_COL = 3;
     private boolean holdUsed = false;
     private GameState gameState = GameState.PLAYING;
+    private TetrominoBag tetrominoBag = new TetrominoBag();
 
     private static final int UI_X =
         Board.COLS * Board.BLOCK_SIZE + 30;
@@ -42,8 +43,7 @@ class GamePanel extends JPanel implements KeyListener {
         bgmPlayer = new BgmPlayer();
         bgmPlayer.play();
 
-        tetromino = Tetromino.createRandom();
-        nextTetromino = Tetromino.createRandom();
+        nextTetromino = new Tetromino(tetrominoBag.next());
         spawnTetromino();
 
         setPreferredSize(new Dimension(
@@ -429,7 +429,7 @@ class GamePanel extends JPanel implements KeyListener {
         blockY = SPAWN_ROW * Board.BLOCK_SIZE;
 
         tetromino = nextTetromino;
-        nextTetromino = Tetromino.createRandom();
+        nextTetromino = new Tetromino(tetrominoBag.next());
     }
 
     private void landTetromino() {
@@ -658,8 +658,8 @@ class GamePanel extends JPanel implements KeyListener {
         score = 0;
 
         // ミノを作り直す
-        tetromino = Tetromino.createRandom();
-        nextTetromino = Tetromino.createRandom();
+        tetromino = new Tetromino(tetrominoBag.next());
+        nextTetromino = new Tetromino(tetrominoBag.next());
 
         // ミノの位置を初期位置に戻す
         blockX = SPAWN_COL * Board.BLOCK_SIZE;
