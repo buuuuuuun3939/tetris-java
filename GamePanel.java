@@ -496,6 +496,7 @@ class GamePanel extends JPanel implements KeyListener {
             // HOLDと現在のミノを交換
             Tetromino temp = holdTetromino;
             holdTetromino = tetromino;
+            holdTetromino.reset(); // ホールドしたミノの形状を元に戻す
             tetromino = temp;
 
             blockX = SPAWN_COL * Board.BLOCK_SIZE;
