@@ -658,8 +658,12 @@ class GamePanel extends JPanel implements KeyListener {
         score = 0;
 
         // ミノを作り直す
-        tetromino = new Tetromino(tetrominoBag.next());
+        tetrominoBag = new TetrominoBag();
         nextTetromino = new Tetromino(tetrominoBag.next());
+        spawnTetromino();
+
+        holdTetromino = null;
+        holdUsed = false;
 
         // ミノの位置を初期位置に戻す
         blockX = SPAWN_COL * Board.BLOCK_SIZE;
