@@ -8,12 +8,14 @@ public class SoundEffectPlayer {
     private Clip clearClip;
     private Clip gameOverClip;
     private Clip rotateClip;
+    private Clip moveClip;
 
     public SoundEffectPlayer() {
         lockClip = loadClip("./bgm/lock.wav");
         clearClip = loadClip("./bgm/clear.wav");
         gameOverClip = loadClip("./bgm/gameover.wav");
         rotateClip = loadClip("./bgm/rotate.wav");
+        moveClip = loadClip("./bgm/move.wav");
     }
 
     private Clip loadClip(String path) {
@@ -42,6 +44,10 @@ public class SoundEffectPlayer {
 
     public void playRotate() {
         play(rotateClip);
+    }
+
+    public void playMove() {
+        play(moveClip);
     }
 
     private void play(Clip clip) {

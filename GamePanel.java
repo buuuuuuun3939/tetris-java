@@ -123,12 +123,14 @@ class GamePanel extends JPanel implements KeyListener {
         if (e.getKeyCode() == KeyEvent.VK_LEFT) {
             if (canMoveLeft()) {
                 blockX -= Board.BLOCK_SIZE;
+                soundEffectPlayer.playMove();
             }
         }
 
         if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
             if (canMoveRight()) {
                 blockX += Board.BLOCK_SIZE;
+                soundEffectPlayer.playMove();
             }
         }
 
