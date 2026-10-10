@@ -37,10 +37,12 @@ class GamePanel extends JPanel implements KeyListener {
     private Tetromino nextTetromino;
     private Tetromino holdTetromino;
     private BgmPlayer bgmPlayer;
+    private SoundEffectPlayer soundEffectPlayer;
 
     public GamePanel() {
         board = new Board();
         bgmPlayer = new BgmPlayer();
+        soundEffectPlayer = new SoundEffectPlayer();
         bgmPlayer.play();
 
         nextTetromino = new Tetromino(tetrominoBag.next());
@@ -434,8 +436,12 @@ class GamePanel extends JPanel implements KeyListener {
 
     private void landTetromino() {
         lockBlock();
+        soundEffectPlayer.playLock();
 
         int clearedRows = board.clearFullRows();
+        if (clearedRows > 0) {
+            soundEffectPlayer.playClear();
+        }
         addScore(clearedRows);
         updateLevel();
 

@@ -1,0 +1,46 @@
+import java.io.File;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+
+public class SoundEffectPlayer {
+    private Clip lockClip;
+    private Clip clearClip;
+
+    public SoundEffectPlayer() {
+        lockClip = loadClip("./bgm/lock.wav");
+        clearClip = loadClip("./bgm/clear.wav");
+    }
+
+    private Clip loadClip(String path) {
+        try (AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(
+                new File(path))) {
+            Clip clip = AudioSystem.getClip();
+            clip.open(audioInputStream);
+            return clip;
+        } catch (Exception e) {
+            // 効果音が読み込めなくてもゲームは続行する
+            return null;
+        }
+    }
+
+    public void playLock() {
+        play(lockClip);
+    }
+
+    public void playClear() {
+        play(clearClip);
+    }
+
+    private void play(Clip clip) {
+        if (clip == null) {
+            return;
+        }
+
+        if (clip.isRunning()) {
+            clip.stop();
+        }
+        clip.setFramePosition(0);
+        clip.start();
+    }
+}
