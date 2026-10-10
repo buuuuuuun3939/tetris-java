@@ -596,13 +596,54 @@ class GamePanel extends JPanel implements KeyListener {
     private void drawGameOver(Graphics g) {
         if (gameState == GameState.GAME_OVER) {
             String message = "GAME OVER";
-            int textWidth = g.getFontMetrics().stringWidth(message);
+            String scoreMessage = "SCORE: " + score;
+            String restartMessage = "Press R to Restart";
 
-            int x = (Board.COLS * Board.BLOCK_SIZE - textWidth) / 2;
-            int y = Board.ROWS * Board.BLOCK_SIZE / 2;
+            int boardWidth = Board.COLS * Board.BLOCK_SIZE;
+            int boardHeight = Board.ROWS * Board.BLOCK_SIZE;
 
-            g.setColor(Color.BLACK);
-            g.drawString(message, x, y);
+            // 盤面を半透明の黒で覆う
+            g.setColor(new Color(0, 0, 0, 170));
+            g.fillRect(0, 0, boardWidth, boardHeight);
+
+            // 文字色
+            g.setColor(Color.WHITE);
+
+            g.setFont(new java.awt.Font(
+                "SansSerif",
+                java.awt.Font.BOLD,
+                28
+            ));
+            int messageWidth = g.getFontMetrics().stringWidth(message);
+            g.drawString(
+                message,
+                (boardWidth - messageWidth) / 2,
+                boardHeight / 2 - 30
+            );
+
+            g.setFont(new java.awt.Font(
+                "SansSerif",
+                java.awt.Font.PLAIN,
+                18
+            ));
+            int scoreWidth = g.getFontMetrics().stringWidth(scoreMessage);
+            g.drawString(
+                scoreMessage,
+                (boardWidth - scoreWidth) / 2,
+                boardHeight / 2
+            );
+
+            g.setFont(new java.awt.Font(
+                "SansSerif",
+                java.awt.Font.PLAIN,
+                14
+            ));
+            int restartWidth = g.getFontMetrics().stringWidth(restartMessage);
+            g.drawString(
+                restartMessage,
+                (boardWidth - restartWidth) / 2,
+                boardHeight / 2 + 30
+            );
         }
     }
 
@@ -656,6 +697,8 @@ class GamePanel extends JPanel implements KeyListener {
         board.clear();
 
         score = 0;
+        level = 1;
+        timer.setDelay(getDropInterval()); // タイマーの落下間隔を500msにリセット
 
         // ミノを作り直す
         tetrominoBag = new TetrominoBag();
