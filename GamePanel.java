@@ -260,6 +260,7 @@ class GamePanel extends JPanel implements KeyListener {
         // そのまま回転できるか試す
         if (canRotate()) {
             tetromino.rotate();
+            soundEffectPlayer.playRotate();
             repaint();
 
             return;
@@ -270,6 +271,7 @@ class GamePanel extends JPanel implements KeyListener {
         blockX = originalX + Board.BLOCK_SIZE;
         if (canRotate()) {
             tetromino.rotate();
+            soundEffectPlayer.playRotate();
             repaint();
 
             return;
@@ -280,6 +282,7 @@ class GamePanel extends JPanel implements KeyListener {
         blockX = originalX - Board.BLOCK_SIZE;
         if (canRotate()) {
             tetromino.rotate();
+            soundEffectPlayer.playRotate();
             repaint();
 
             return;
