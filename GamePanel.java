@@ -649,15 +649,47 @@ class GamePanel extends JPanel implements KeyListener {
 
     private void drawPaused(Graphics g) {
         if (gameState == GameState.PAUSED) {
+            int boardWidth = Board.COLS * Board.BLOCK_SIZE;
+            int boardHeight = Board.ROWS * Board.BLOCK_SIZE;
+
+            // 半透明の黒い背景
+            g.setColor(new Color(0, 0, 0, 170));
+            g.fillRect(0, 0, boardWidth, boardHeight);
+
             String message = "PAUSED";
+            String resumeMessage = "Press P to Resume";
 
-            int textWidth = g.getFontMetrics().stringWidth(message);
+            int centerX = boardWidth / 2;
+            int centerY = boardHeight / 2;
 
-            int x = (Board.COLS * Board.BLOCK_SIZE - textWidth) / 2;
-            int y = Board.ROWS * Board.BLOCK_SIZE / 2;
+            // PAUSEDを大きく太字で表示
+            g.setColor(Color.WHITE);
+            g.setFont(new java.awt.Font(
+                "SansSerif",
+                java.awt.Font.BOLD,
+                28
+            ));
 
-            g.setColor(Color.BLACK);
-            g.drawString(message, x, y);
+            int messageWidth = g.getFontMetrics().stringWidth(message);
+            g.drawString(
+                message,
+                centerX - messageWidth / 2,
+                centerY - 10
+            );
+
+            // 再開方法を表示
+            g.setFont(new java.awt.Font(
+                "SansSerif",
+                java.awt.Font.PLAIN,
+                14
+            ));
+
+            int resumeWidth = g.getFontMetrics().stringWidth(resumeMessage);
+            g.drawString(
+                resumeMessage,
+                centerX - resumeWidth / 2,
+                centerY + 25
+            );
         }
     }
 
