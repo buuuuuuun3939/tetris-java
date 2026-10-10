@@ -65,7 +65,7 @@ class GamePanel extends JPanel implements KeyListener {
             if (canMoveDown()) {
                 blockY += BLOCK_SIZE;
             } else {
-                landTetromino();
+                landTetromino(false);
 
                 //　ミノ初期位置
                 blockX = 90;
@@ -440,9 +440,13 @@ class GamePanel extends JPanel implements KeyListener {
         nextTetromino = new Tetromino(tetrominoBag.next());
     }
 
-    private void landTetromino() {
+    private void landTetromino(boolean hardDropped) {
         lockBlock();
-        soundEffectPlayer.playLock();
+        if (hardDropped) {
+            soundEffectPlayer.playDrop();
+        } else {
+            soundEffectPlayer.playLock();
+        }
 
         int clearedRows = board.clearFullRows();
         if (clearedRows > 0) {
@@ -465,7 +469,7 @@ class GamePanel extends JPanel implements KeyListener {
             blockY += Board.BLOCK_SIZE;
         }
 
-        landTetromino();
+        landTetromino(true);
         repaint();
     }
 
