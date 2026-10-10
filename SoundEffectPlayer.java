@@ -6,10 +6,12 @@ import javax.sound.sampled.Clip;
 public class SoundEffectPlayer {
     private Clip lockClip;
     private Clip clearClip;
+    private Clip gameOverClip;
 
     public SoundEffectPlayer() {
         lockClip = loadClip("./bgm/lock.wav");
         clearClip = loadClip("./bgm/clear.wav");
+        gameOverClip = loadClip("./bgm/gameover.wav");
     }
 
     private Clip loadClip(String path) {
@@ -30,6 +32,10 @@ public class SoundEffectPlayer {
 
     public void playClear() {
         play(clearClip);
+    }
+
+    public void playGameOver() {
+        play(gameOverClip);
     }
 
     private void play(Clip clip) {

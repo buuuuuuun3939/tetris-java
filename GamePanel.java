@@ -311,6 +311,7 @@ class GamePanel extends JPanel implements KeyListener {
         gameState = GameState.GAME_OVER;
         timer.stop();
         bgmPlayer.stop();
+        soundEffectPlayer.playGameOver();
     }
 
     private void togglePause() {
