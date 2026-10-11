@@ -3,8 +3,9 @@
 ## 対象
 
 - 要件対象: `Tetromino`
-- テストクラス（予定）: `TetrominoTest`
-- 状態: 以下のケースは設計済み・未実装
+- テストクラス: `TetrominoTest`
+- テストソース: `src/test/java/TetrominoTest.java`
+- 状態: 4ケースのメソッド骨組み作成済み。検証処理は未実装で、各メソッドは `@Disabled`。
 
 ## 要件
 
@@ -33,10 +34,19 @@
 
 | ケースID | 前提条件 | 操作 | 期待結果 | 優先度 | 状態 |
 |---|---|---|---|---|---|
-| TET-001 | `TetrominoType` の各値 | 各値で `Tetromino` を作成する | `getShape()` と `getColor()` が上表の期待値と一致する | P1 | 未実装 |
-| TET-002 | 各種類の初期形状 | `getRotatedShape()` の戻り値を確認する | 戻り値が下表の時計回り90度回転後の形状と一致する | P1 | 未実装 |
-| TET-003 | 各種類の初期形状 | `rotate()` を4回呼び出す | 最終形状がTET-001の初期形状と一致する | P2 | 未実装 |
-| TET-004 | 任意の種類の初期形状 | 回転後形状を取得し、現在形状も再取得する | 戻り値は回転後形状、現在形状は呼び出し前と一致する | P1 | 未実装 |
+| TET-001 | `TetrominoType` の各値 | 各値で `Tetromino` を作成する | `getShape()` と `getColor()` が上表の期待値と一致する | P1 | 骨組み作成済み・未実装 |
+| TET-002 | 各種類の初期形状 | `getRotatedShape()` の戻り値を確認する | 戻り値が下表の時計回り90度回転後の形状と一致する | P1 | 骨組み作成済み・未実装 |
+| TET-003 | 各種類の初期形状 | `rotate()` を4回呼び出す | 最終形状がTET-001の初期形状と一致する | P2 | 骨組み作成済み・未実装 |
+| TET-004 | 任意の種類の初期形状 | 回転後形状を取得し、現在形状も再取得する | 戻り値は回転後形状、現在形状は呼び出し前と一致する | P1 | 骨組み作成済み・未実装 |
+
+## テストメソッドとの対応
+
+| ケースID | テストメソッド |
+|---|---|
+| TET-001 | `eachTypeHasExpectedInitialShapeAndColor` |
+| TET-002 | `eachTypeReturnsExpectedClockwiseRotatedShape` |
+| TET-003 | `fourRotationsRestoreInitialShape` |
+| TET-004 | `gettingRotatedShapeDoesNotChangeCurrentShape` |
 
 ### TET-002: 時計回り90度回転後の期待値
 
