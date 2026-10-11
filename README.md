@@ -14,9 +14,30 @@ Java (Swing) で実装したシンプルなテトリスです。
 
 ## 動作環境
 
-- Java 8以上（`javax.swing` / `javax.sound.sampled` を使用）
+- Java 17以上（`javax.swing` / `javax.sound.sampled` を使用）
+
+## ビルドとテスト
+
+Mavenをインストールした環境で、プロジェクトのルートから次を実行します。
+
+```bash
+mvn test
+```
+
+JUnit 5のテストを実行します。テストを含めてビルドする場合は `mvn package` を実行します。
+
+テストの方針と機能別のケースは [`docs/test-design/`](docs/test-design/TEST_PLAN.md) にまとめています。
 
 ## 起動方法
+
+Mavenでビルドした後、プロジェクトのルートで起動します。
+
+```bash
+mvn package
+java -cp target/classes Main
+```
+
+従来どおり、Javaだけで直接コンパイルして起動することもできます。
 
 ```bash
 javac *.java
@@ -42,6 +63,8 @@ BGMはカレントディレクトリからの相対パス（`./bgm/`）で読み
 効果音は `bgm/lock.wav`（ミノ固定時）、`bgm/clear.wav`（ライン消去時）、`bgm/gameover.wav`（ゲームオーバー時）、`bgm/rotate.wav`（回転時）、`bgm/move.wav`（左右移動時）、`bgm/drop.wav`（ハードドロップ時）から読み込みます。音源が見つからない場合もゲームは動作します。
 
 ## ファイル構成
+
+既存のJavaソースはルート直下に残し、テストは `src/test/java` に配置します。
 
 | ファイル | 役割 |
 | --- | --- |
