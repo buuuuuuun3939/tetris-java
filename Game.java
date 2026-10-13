@@ -112,6 +112,80 @@ public class Game {
         return gameState;
     }
 
+    public boolean moveLeft() {
+        if (!canPlaceCurrentAt(currentRow, currentCol - 1)) {
+            return false;
+        }
+        currentCol--;
+        return true;
+    }
+
+    public boolean moveRight() {
+        if (!canPlaceCurrentAt(currentRow, currentCol + 1)) {
+            return false;
+        }
+        currentCol++;
+        return true;
+    }
+
+    /** Moves down one board cell. Returns false when blocked. */
+    public boolean moveDown() {
+        if (!canMoveDownFromRow(currentRow)) {
+            return false;
+        }
+        currentRow++;
+        return true;
+    }
+
+    /**
+     * Rotates clockwise. If needed, tries shifting one cell right and then
+     * one cell left, matching the existing wall adjustment behavior.
+     */
+    public boolean rotate() {
+        int[][] rotatedShape = currentTetromino.getRotatedShape();
+        int[] candidateCols = {currentCol, currentCol + 1, currentCol - 1};
+
+        for (int candidateCol : candidateCols) {
+            if (canPlace(rotatedShape, currentRow, candidateCol)) {
+                currentTetromino.rotate();
+                currentCol = candidateCol;
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /** Returns whether the current piece can move down from the given row. */
+    boolean canMoveDownFromRow(int row) {
+        return canPlaceCurrentAt(row + 1, currentCol);
+    }
+
+    private boolean canPlaceCurrentAt(int row, int col) {
+        return canPlace(currentTetromino.getShape(), row, col);
+    }
+
+    private boolean canPlace(int[][] shape, int row, int col) {
+        for (int shapeRow = 0; shapeRow < shape.length; shapeRow++) {
+            for (int shapeCol = 0; shapeCol < shape[shapeRow].length; shapeCol++) {
+                if (shape[shapeRow][shapeCol] == 0) {
+                    continue;
+                }
+
+                int boardRow = row + shapeRow;
+                int boardCol = col + shapeCol;
+                if (boardRow < 0 || boardRow >= Board.ROWS
+                        || boardCol < 0 || boardCol >= Board.COLS) {
+                    return false;
+                }
+                if (board.getBlock(boardRow, boardCol) != null) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
     /* Temporary accessors for moving GamePanel state before moving its rules. */
     Board boardForTransition() {
         return board;

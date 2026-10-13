@@ -45,12 +45,8 @@ class GamePanel extends JPanel implements KeyListener {
                 return;
             }
 
-            if (canMoveDown()) {
-                game.setCurrentPositionForTransition(
-                    game.getCurrentRow() + 1, game.getCurrentCol());
-            } else {
+            if (!game.moveDown()) {
                 landTetromino(false);
-
             }
 
             repaint();
@@ -102,30 +98,25 @@ class GamePanel extends JPanel implements KeyListener {
 
 
         if (e.getKeyCode() == KeyEvent.VK_LEFT) {
-            if (canMoveLeft()) {
-                game.setCurrentPositionForTransition(
-                    game.getCurrentRow(), game.getCurrentCol() - 1);
+            if (game.moveLeft()) {
                 soundEffectPlayer.playMove();
             }
         }
 
         if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
-            if (canMoveRight()) {
-                game.setCurrentPositionForTransition(
-                    game.getCurrentRow(), game.getCurrentCol() + 1);
+            if (game.moveRight()) {
                 soundEffectPlayer.playMove();
             }
         }
 
         if (e.getKeyCode() == KeyEvent.VK_DOWN) {
-            if (canMoveDown()) {
-                game.setCurrentPositionForTransition(
-                    game.getCurrentRow() + 1, game.getCurrentCol());
-            }
+            game.moveDown();
         }
 
         if (e.getKeyCode() == KeyEvent.VK_UP) {
-            tryRotate();
+            if (game.rotate()) {
+                soundEffectPlayer.playRotate();
+            }
         }
 
         if (e.getKeyCode() == KeyEvent.VK_SPACE) {
@@ -142,140 +133,6 @@ class GamePanel extends JPanel implements KeyListener {
 
     @Override
     public void keyReleased(KeyEvent e) {
-    }
-
-    private boolean canMoveDown() {
-        return canMoveDownAt(game.getCurrentRow() * Board.BLOCK_SIZE);
-    }
-
-    private boolean canMoveLeft() {
-        int[][] shape = game.currentTetrominoForTransition().getShape();
-        int currentRow = game.getCurrentRow();
-        int currentCol = game.getCurrentCol();
-
-        for (int row = 0; row < shape.length; row++) {
-            for (int col = 0; col < shape[row].length; col++) {
-
-                if (shape[row][col] == 0) {
-                    continue;
-                }
-
-                int boardRow = currentRow + row;
-                int nextCol = currentCol + col - 1;
-
-                // Boardの左端に到達した
-                if (nextCol < 0) {
-                    return false;
-                }
-
-                // 左のマスに固定ブロックがある
-                if (game.boardForTransition().getBlock(boardRow, nextCol) != null) {
-                    return false;
-                }
-            }
-        }
-
-        return true;
-    }
-
-
-    private boolean canMoveRight() {
-        int[][] shape = game.currentTetrominoForTransition().getShape();
-        int currentRow = game.getCurrentRow();
-        int currentCol = game.getCurrentCol();
-
-        for (int row = 0; row < shape.length; row++) {
-            for (int col = 0; col < shape[row].length; col++) {
-
-                if (shape[row][col] == 0) {
-                    continue;
-                }
-
-                int boardRow = currentRow + row;
-                int nextCol = currentCol + col + 1;
-
-                // Boardの右端に到達した
-                if (nextCol >= Board.COLS) {
-                    return false;
-                }
-
-                // 右のマスに固定ブロックがある
-                if (game.boardForTransition().getBlock(boardRow, nextCol) != null) {
-                    return false;
-                }
-            }
-        }
-
-        return true;
-    }
-
-    private boolean canRotate() {
-        int[][] rotatedShape = game.currentTetrominoForTransition().getRotatedShape();
-        int currentRow = game.getCurrentRow();
-        int currentCol = game.getCurrentCol();
-
-        for (int row = 0; row < rotatedShape.length; row++) {
-            for (int col = 0; col < rotatedShape[row].length; col++) {
-
-                if (rotatedShape[row][col] == 0) {
-                    continue;
-                }
-
-                int boardRow = currentRow + row;
-                int boardCol = currentCol + col;
-
-                // Boardの外に出る
-                if (boardRow < 0 || boardRow >= Board.ROWS
-                    || boardCol < 0 || boardCol >= Board.COLS) {
-                    return false;
-                }
-
-                // 回転先に固定ブロックがある
-                if (game.boardForTransition().getBlock(boardRow, boardCol) != null) {
-                    return false;
-                }
-            }
-        }
-
-        return true;
-    }
-
-    private void tryRotate() {
-        int originalCol = game.getCurrentCol();
-
-        // そのまま回転できるか試す
-        if (canRotate()) {
-            game.currentTetrominoForTransition().rotate();
-            soundEffectPlayer.playRotate();
-            repaint();
-
-            return;
-        }
-
-        // 左端に寄っている場合の処理
-        // 1マス右にずらして回転できるか試す
-        game.setCurrentPositionForTransition(game.getCurrentRow(), originalCol + 1);
-        if (canRotate()) {
-            game.currentTetrominoForTransition().rotate();
-            soundEffectPlayer.playRotate();
-            repaint();
-
-            return;
-        }
-
-        // 右端に寄っている場合の処理
-        // 1マス左にずらして回転できるか試す
-        game.setCurrentPositionForTransition(game.getCurrentRow(), originalCol - 1);
-        if (canRotate()) {
-            game.currentTetrominoForTransition().rotate();
-            soundEffectPlayer.playRotate();
-            repaint();
-
-            return;
-        }
-
-
-        game.setCurrentPositionForTransition(game.getCurrentRow(), originalCol);
     }
 
     private int getDropInterval() {
@@ -450,9 +307,8 @@ class GamePanel extends JPanel implements KeyListener {
     }
 
     private void hardDrop() {
-        while (canMoveDown()) {
-            game.setCurrentPositionForTransition(
-                game.getCurrentRow() + 1, game.getCurrentCol());
+        while (game.moveDown()) {
+            // Keep moving until the next cell is blocked.
         }
 
         landTetromino(true);
@@ -734,40 +590,11 @@ class GamePanel extends JPanel implements KeyListener {
     private int getGhostY() {
         int ghostY = game.getCurrentRow() * Board.BLOCK_SIZE;
 
-        while (canMoveDownAt(ghostY)) {
+        while (game.canMoveDownFromRow(ghostY / Board.BLOCK_SIZE)) {
             ghostY += Board.BLOCK_SIZE;
         }
 
         return ghostY;
     }
 
-    private boolean canMoveDownAt(int testY) {
-
-        int[][] shape = game.currentTetrominoForTransition().getShape();
-
-        int currentRow = testY / Board.BLOCK_SIZE;
-        int currentCol = game.getCurrentCol();
-
-        for (int row = 0; row < shape.length; row++) {
-            for (int col = 0; col < shape[row].length; col++) {
-
-                if (shape[row][col] == 0) {
-                    continue;
-                }
-
-                int nextRow = currentRow + row + 1;
-                int boardCol = currentCol + col;
-
-                if (nextRow >= Board.ROWS) {
-                    return false;
-                }
-
-                if (game.boardForTransition().getBlock(nextRow, boardCol) != null) {
-                    return false;
-                }
-            }
-        }
-
-        return true;
-    }
 }
