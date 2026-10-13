@@ -51,6 +51,7 @@ class TetrominoTest {
 
             // 形状の列数と値を比較する
             for (int row = 0; row < expectedShape.length; row++) {
+                assertEquals(expectedShape[row].length, actualShape[row].length, "Mismatch in shape row length for type: " + type); // 余分な行がないか確認
                 assertArrayEquals(expectedShape[row], actualShape[row], "Mismatch in shape for type: " + type);
             }
 
@@ -71,6 +72,7 @@ class TetrominoTest {
 
             // 回転後形状の列数と値を比較する
             for (int row = 0; row < expectedRotatedShape.length; row++) {
+                assertEquals(expectedRotatedShape[row].length, actualRotatedShape[row].length, "Mismatch in rotated shape row length for type: " + type); // 余分な行がないか確認
                 assertArrayEquals(expectedRotatedShape[row], actualRotatedShape[row], "Mismatch in rotated shape for type: " + type);
             }
         }
@@ -88,8 +90,10 @@ class TetrominoTest {
             for (int i = 0; i < 4; i++) {
                 tetromino.rotate();
             }
-
             int[][] finalShape = tetromino.getShape();
+
+            // 初期形状と最終形状の行数を比較する
+            assertEquals(initialShape.length, finalShape.length, "Mismatch in shape length for type: " + type);
 
             // 初期形状と最終形状を比較する
             for (int row = 0; row < initialShape.length; row++) {
@@ -106,14 +110,22 @@ class TetrominoTest {
         for (TetrominoType type : TetrominoType.values()) {
             Tetromino tetromino = new Tetromino(type);
             int[][] initialShape = tetromino.getShape();
+            int[][] originalShape = new int[initialShape.length][];
 
+            // getShape() で tetromino の中身が変更された場合を検出できるように、初期形状をコピーして保持する
+            for (int i = 0; i < initialShape.length; i++) {
+                originalShape[i] = initialShape[i].clone();
+            }
+
+            tetromino.getRotatedShape(); // 回転後形状を取得するが、tetrominoの現在形状は変化しないはず
             // 回転後形状を取得する
-            int[][] rotatedShape = tetromino.getRotatedShape();
+            int[][] currentShape = tetromino.getShape();
+            // 初期形状と回転後形状の取得後の行数を比較する
+            assertEquals(originalShape.length, currentShape.length, "Mismatch in shape length for type: " + type);
 
             // 現在形状が変化していないことを確認する
-            int[][] currentShapeAfterRotation = tetromino.getShape();
-            for (int row = 0; row < initialShape.length; row++) {
-                assertArrayEquals(initialShape[row], currentShapeAfterRotation[row], "Current shape changed after getting rotated shape for type: " + type);
+            for (int row = 0; row < originalShape.length; row++) {
+                assertArrayEquals(originalShape[row], currentShape[row], "Current shape changed after getting rotated shape for type: " + type);
             }
         }
     }
