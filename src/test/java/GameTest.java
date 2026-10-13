@@ -98,17 +98,17 @@ class GameTest {
     @Test
     void movementStopsBeforeFixedBlocks() {
         Game leftGame = new Game(fixedPieces(TetrominoType.O, TetrominoType.I));
-        leftGame.boardForTransition().setBlock(0, 2, Color.GRAY);
+        leftGame.boardForTest().setBlock(0, 2, Color.GRAY);
         assertFalse(leftGame.moveLeft());
         assertEquals(3, leftGame.getCurrentCol());
 
         Game rightGame = new Game(fixedPieces(TetrominoType.O, TetrominoType.I));
-        rightGame.boardForTransition().setBlock(0, 5, Color.GRAY);
+        rightGame.boardForTest().setBlock(0, 5, Color.GRAY);
         assertFalse(rightGame.moveRight());
         assertEquals(3, rightGame.getCurrentCol());
 
         Game downGame = new Game(fixedPieces(TetrominoType.O, TetrominoType.I));
-        downGame.boardForTransition().setBlock(2, 3, Color.GRAY);
+        downGame.boardForTest().setBlock(2, 3, Color.GRAY);
         assertFalse(downGame.moveDown());
         assertEquals(0, downGame.getCurrentRow());
     }
@@ -146,9 +146,9 @@ class GameTest {
     void rotationDoesNotChangePieceWhenEveryCandidateIsBlocked() {
         Game game = new Game(fixedPieces(TetrominoType.T, TetrominoType.I));
         int[][] initialShape = game.getCurrentShape();
-        game.boardForTransition().setBlock(2, 2, Color.GRAY);
-        game.boardForTransition().setBlock(2, 3, Color.GRAY);
-        game.boardForTransition().setBlock(2, 4, Color.GRAY);
+        game.boardForTest().setBlock(2, 2, Color.GRAY);
+        game.boardForTest().setBlock(2, 3, Color.GRAY);
+        game.boardForTest().setBlock(2, 4, Color.GRAY);
 
         assertFalse(game.rotate());
 
@@ -170,8 +170,9 @@ class GameTest {
 
     @Test
     void tickLocksPieceWhenItCannotMoveDown() {
-        Game game = new Game(fixedPieces(TetrominoType.I, TetrominoType.O));
-        game.setCurrentPositionForTransition(Board.ROWS - 1, 3);
+        Game game = new Game(fixedPieces(
+            TetrominoType.I, TetrominoType.O, TetrominoType.T));
+        game.setCurrentPositionForTest(Board.ROWS - 1, 3);
 
         Game.StepResult result = game.tick();
 
@@ -179,33 +180,35 @@ class GameTest {
         assertEquals(0, result.getClearedRows());
         for (int col = 3; col < 7; col++) {
             assertEquals(Color.CYAN,
-                game.boardForTransition().getBlock(Board.ROWS - 1, col));
+                game.boardForTest().getBlock(Board.ROWS - 1, col));
         }
+        assertEquals(0, game.getCurrentRow());
     }
 
     @Test
     void hardDropMovesPieceToBottomAndLocksIt() {
-        Game game = new Game(fixedPieces(TetrominoType.I, TetrominoType.O));
+        Game game = new Game(fixedPieces(
+            TetrominoType.I, TetrominoType.O, TetrominoType.T));
 
         Game.StepResult result = game.hardDrop();
 
         assertTrue(result.isPieceLocked());
-        assertEquals(Board.ROWS - 1, game.getCurrentRow());
         for (int col = 3; col < 7; col++) {
             assertEquals(Color.CYAN,
-                game.boardForTransition().getBlock(Board.ROWS - 1, col));
+                game.boardForTest().getBlock(Board.ROWS - 1, col));
         }
+        assertEquals(0, game.getCurrentRow());
+        assertEquals(Color.YELLOW, game.getCurrentColor());
     }
 
     @Test
     void clearingLinesUpdatesScoreAndLevel() {
-        Game game = new Game(fixedPieces(TetrominoType.I, TetrominoType.O));
-        game.setCurrentPositionForTransition(Board.ROWS - 1, 3);
+        Game game = new Game(repeatingPieces(TetrominoType.I));
 
         for (int line = 0; line < 10; line++) {
             for (int col = 0; col < Board.COLS; col++) {
                 if (col < 3 || col > 6) {
-                    game.boardForTransition().setBlock(
+                    game.boardForTest().setBlock(
                         Board.ROWS - 1, col, Color.GRAY);
                 }
             }
@@ -218,7 +221,97 @@ class GameTest {
         assertEquals(1000, game.getScore());
         assertEquals(2, game.getLevel());
         for (int col = 0; col < Board.COLS; col++) {
-            assertNull(game.boardForTransition().getBlock(Board.ROWS - 1, col));
+            assertNull(game.boardForTest().getBlock(Board.ROWS - 1, col));
+        }
+    }
+
+    @Test
+    void holdStoresCurrentPieceAndPromotesNextPiece() {
+        Game game = new Game(fixedPieces(
+            TetrominoType.I, TetrominoType.O, TetrominoType.T));
+
+        assertTrue(game.hold());
+
+        assertEquals(Color.CYAN, game.getHoldColor());
+        assertEquals(Color.YELLOW, game.getCurrentColor());
+        assertEquals(Color.MAGENTA, game.getNextColor());
+        assertEquals(0, game.getCurrentRow());
+        assertEquals(3, game.getCurrentCol());
+        assertTrue(game.isHoldUsed());
+    }
+
+    @Test
+    void holdCanBeUsedAgainAfterLockAndSwapsPieces() {
+        Game game = new Game(fixedPieces(
+            TetrominoType.I, TetrominoType.O, TetrominoType.T,
+            TetrominoType.S, TetrominoType.Z, TetrominoType.L));
+
+        assertTrue(game.hold());
+        assertFalse(game.hold());
+        assertTrue(game.hardDrop().isPieceLocked());
+        assertFalse(game.isHoldUsed());
+
+        assertTrue(game.rotate());
+        int[][] initialTShape = {
+            {0, 1, 0},
+            {1, 1, 1}
+        };
+        assertShapeEquals(new int[][] {{1, 0}, {1, 1}, {1, 0}},
+            game.getCurrentShape());
+
+        assertTrue(game.hold());
+
+        assertEquals(Color.CYAN, game.getCurrentColor());
+        assertEquals(Color.MAGENTA, game.getHoldColor());
+        assertShapeEquals(initialTShape, game.getHoldShape());
+        assertEquals(0, game.getCurrentRow());
+        assertEquals(3, game.getCurrentCol());
+    }
+
+    @Test
+    void blockedSpawnChangesGameStateToGameOver() {
+        Game game = new Game(fixedPieces(
+            TetrominoType.I, TetrominoType.O, TetrominoType.T));
+        game.boardForTest().setBlock(1, 3, Color.GRAY);
+
+        Game.StepResult result = game.tick();
+
+        assertTrue(result.isPieceLocked());
+        assertEquals(GameState.GAME_OVER, game.getGameState());
+        assertEquals(Color.CYAN, game.boardForTest().getBlock(0, 3));
+    }
+
+    @Test
+    void restartResetsGameStateAndCreatesFreshPieces() {
+        Game game = new Game(fixedPieces(
+            TetrominoType.I, TetrominoType.O, TetrominoType.T,
+            TetrominoType.S, TetrominoType.Z, TetrominoType.L));
+        for (int col = 0; col < Board.COLS; col++) {
+            if (col < 3 || col > 6) {
+                game.boardForTest().setBlock(Board.ROWS - 1, col, Color.GRAY);
+            }
+        }
+        game.setCurrentPositionForTest(Board.ROWS - 1, 3);
+        game.hardDrop();
+        game.hold();
+        game.boardForTest().setBlock(5, 5, Color.BLUE);
+        game.setGameStateForTransition(GameState.PAUSED);
+
+        game.restart();
+
+        assertEquals(0, game.getScore());
+        assertEquals(1, game.getLevel());
+        assertEquals(GameState.PLAYING, game.getGameState());
+        assertFalse(game.isHoldUsed());
+        assertNull(game.getHoldShape());
+        assertEquals(Color.RED, game.getCurrentColor());
+        assertEquals(Color.ORANGE, game.getNextColor());
+        assertEquals(0, game.getCurrentRow());
+        assertEquals(3, game.getCurrentCol());
+        for (Color[] row : game.getBoardSnapshot()) {
+            for (Color block : row) {
+                assertNull(block);
+            }
         }
     }
 
@@ -235,5 +328,9 @@ class GameTest {
             pieces.addLast(new Tetromino(type));
         }
         return pieces::removeFirst;
+    }
+
+    private static TetrominoSource repeatingPieces(TetrominoType type) {
+        return () -> new Tetromino(type);
     }
 }

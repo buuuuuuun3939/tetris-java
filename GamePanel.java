@@ -8,8 +8,6 @@ import javax.swing.Timer;
 
 class GamePanel extends JPanel implements KeyListener {
 
-    private static final int SPAWN_ROW = 0;
-    private static final int SPAWN_COL = 3;
     private Game game;
 
     private static final int UI_X =
@@ -73,7 +71,9 @@ class GamePanel extends JPanel implements KeyListener {
     @Override
     public void keyPressed(KeyEvent e) {
         if (e.getKeyCode() == KeyEvent.VK_C) {
-            hold();
+            if (game.hold() && game.getGameState() == GameState.GAME_OVER) {
+                handleGameOver();
+            }
             repaint();
             return;
         }
@@ -154,8 +154,7 @@ class GamePanel extends JPanel implements KeyListener {
         repaint();
     }
 
-    private void setGameOver() {
-        game.setGameStateForTransition(GameState.GAME_OVER);
+    private void handleGameOver() {
         timer.stop();
         bgmPlayer.stop();
         soundEffectPlayer.playGameOver();
@@ -219,45 +218,6 @@ class GamePanel extends JPanel implements KeyListener {
         g.drawString(String.valueOf(game.getLevel()), UI_X, LEVEL_Y + 25);
     }
 
-    private boolean canSpawn() {
-        int[][] shape = game.currentTetrominoForTransition().getShape();
-        int startRow = 0;
-        int startCol = game.getCurrentCol();
-
-        for (int row = 0; row < shape.length; row++) {
-            for (int col = 0; col < shape[row].length; col++) {
-
-                // 形状がない部分は無視
-                if (shape[row][col] == 0) {
-                    continue;
-                }
-
-                int boardRow = startRow + row;
-                int boardCol = startCol + col;
-
-                if (boardRow >= Board.ROWS) {
-                    return false;
-                }
-
-                if (boardCol < 0 || boardCol >= Board.COLS) {
-                    return false;
-                }
-
-                if (game.boardForTransition().getBlock(boardRow, boardCol) != null) {
-                    return false;
-                }
-            }
-        }
-
-        return true;
-    }
-
-    private void spawnTetromino() {
-        game.setCurrentTetrominoForTransition(game.nextTetrominoForTransition());
-        game.setNextTetrominoForTransition(game.nextPieceForTransition());
-        game.setCurrentPositionForTransition(SPAWN_ROW, SPAWN_COL);
-    }
-
     private void handlePieceLocked(Game.StepResult result, boolean hardDropped) {
         if (hardDropped) {
             soundEffectPlayer.playDrop();
@@ -270,11 +230,8 @@ class GamePanel extends JPanel implements KeyListener {
         }
         timer.setDelay(getDropInterval());
 
-        spawnTetromino();
-        game.setHoldUsedForTransition(false);
-
-        if (!canSpawn()) {
-            setGameOver();
+        if (game.getGameState() == GameState.GAME_OVER) {
+            handleGameOver();
         }
 
     }
@@ -283,32 +240,6 @@ class GamePanel extends JPanel implements KeyListener {
         Game.StepResult result = game.hardDrop();
         handlePieceLocked(result, true);
         repaint();
-    }
-
-    private void hold() {
-        // すでにHOLDしていたら何もしない
-        if (game.isHoldUsed()) {
-            return;
-        }
-
-        // HOLDが空の場合
-        if (game.holdTetrominoForTransition() == null) {
-            game.setHoldTetrominoForTransition(game.currentTetrominoForTransition());
-            spawnTetromino();
-        } else {
-            // HOLDと現在のミノを交換
-            Tetromino temp = game.holdTetrominoForTransition();
-            game.setHoldTetrominoForTransition(game.currentTetrominoForTransition());
-            game.holdTetrominoForTransition().reset(); // ホールドしたミノの形状を元に戻す
-            game.setCurrentTetrominoForTransition(temp);
-            game.setCurrentPositionForTransition(SPAWN_ROW, SPAWN_COL);
-        }
-
-        game.setHoldUsedForTransition(true);
-
-        if (!canSpawn()) {
-            setGameOver();
-        }
     }
 
     // 盤面外でミノの形状を中央に配置するためのオフセットを計算する
@@ -552,7 +483,7 @@ class GamePanel extends JPanel implements KeyListener {
     }
 
     private void restartGame() {
-        game = new Game();
+        game.restart();
         timer.setDelay(getDropInterval()); // タイマーの落下間隔を500msにリセット
         startGame();
     }

@@ -1,5 +1,6 @@
 import java.awt.Color;
 import java.util.Objects;
+import java.util.function.Supplier;
 
 /** Holds game state and screen-independent game rules. */
 public class Game {
@@ -7,7 +8,8 @@ public class Game {
     private static final int SPAWN_COL = 3;
 
     private final Board board;
-    private final TetrominoSource tetrominoSource;
+    private final Supplier<TetrominoSource> tetrominoSourceFactory;
+    private TetrominoSource tetrominoSource;
 
     private Tetromino currentTetromino;
     private Tetromino nextTetromino;
@@ -21,12 +23,17 @@ public class Game {
 
     /** Creates a game using the existing randomized 7-bag. */
     public Game() {
-        this(createBagSource());
+        this(Game::createBagSource);
     }
 
     /** Creates a game with a replaceable piece source, useful for tests. */
     public Game(TetrominoSource tetrominoSource) {
-        this.tetrominoSource = Objects.requireNonNull(tetrominoSource);
+        this(() -> Objects.requireNonNull(tetrominoSource));
+    }
+
+    private Game(Supplier<TetrominoSource> tetrominoSourceFactory) {
+        this.tetrominoSourceFactory = Objects.requireNonNull(tetrominoSourceFactory);
+        this.tetrominoSource = Objects.requireNonNull(tetrominoSourceFactory.get());
         this.board = new Board();
         this.score = 0;
         this.level = 1;
@@ -110,6 +117,9 @@ public class Game {
     }
 
     public boolean moveLeft() {
+        if (gameState != GameState.PLAYING) {
+            return false;
+        }
         if (!canPlaceCurrentAt(currentRow, currentCol - 1)) {
             return false;
         }
@@ -118,6 +128,9 @@ public class Game {
     }
 
     public boolean moveRight() {
+        if (gameState != GameState.PLAYING) {
+            return false;
+        }
         if (!canPlaceCurrentAt(currentRow, currentCol + 1)) {
             return false;
         }
@@ -127,6 +140,9 @@ public class Game {
 
     /** Moves down one board cell. Returns false when blocked. */
     public boolean moveDown() {
+        if (gameState != GameState.PLAYING) {
+            return false;
+        }
         if (!canMoveDownFromRow(currentRow)) {
             return false;
         }
@@ -139,6 +155,9 @@ public class Game {
      * one cell left, matching the existing wall adjustment behavior.
      */
     public boolean rotate() {
+        if (gameState != GameState.PLAYING) {
+            return false;
+        }
         int[][] rotatedShape = currentTetromino.getRotatedShape();
         int[] candidateCols = {currentCol, currentCol + 1, currentCol - 1};
 
@@ -155,6 +174,9 @@ public class Game {
 
     /** Advances the game by one automatic gravity step. */
     public StepResult tick() {
+        if (gameState != GameState.PLAYING) {
+            return StepResult.moved();
+        }
         if (moveDown()) {
             return StepResult.moved();
         }
@@ -163,6 +185,9 @@ public class Game {
 
     /** Drops the current piece as far as possible, then locks it. */
     public StepResult hardDrop() {
+        if (gameState != GameState.PLAYING) {
+            return StepResult.moved();
+        }
         while (moveDown()) {
             // Continue until the next cell is blocked.
         }
@@ -186,7 +211,61 @@ public class Game {
         int clearedRows = board.clearFullRows();
         score += clearedRows * 100;
         level = score / 1000 + 1;
+        holdUsed = false;
+        spawnNextPiece();
         return StepResult.locked(clearedRows);
+    }
+
+    /** Stores the current piece or swaps it with the held piece. */
+    public boolean hold() {
+        if (gameState != GameState.PLAYING || holdUsed) {
+            return false;
+        }
+
+        if (holdTetromino == null) {
+            holdTetromino = currentTetromino;
+            spawnNextPiece();
+        } else {
+            Tetromino heldPiece = holdTetromino;
+            holdTetromino = currentTetromino;
+            holdTetromino.reset();
+            currentTetromino = heldPiece;
+            currentRow = SPAWN_ROW;
+            currentCol = SPAWN_COL;
+            setGameOverIfCurrentPieceCannotSpawn();
+        }
+
+        holdUsed = true;
+        return true;
+    }
+
+    /** Restarts with an empty board and a new pair of pieces. */
+    public void restart() {
+        board.clear();
+        score = 0;
+        level = 1;
+        holdTetromino = null;
+        holdUsed = false;
+        gameState = GameState.PLAYING;
+        tetrominoSource = Objects.requireNonNull(tetrominoSourceFactory.get());
+        currentRow = SPAWN_ROW;
+        currentCol = SPAWN_COL;
+        currentTetromino = nextPiece();
+        nextTetromino = nextPiece();
+    }
+
+    private void spawnNextPiece() {
+        currentTetromino = nextTetromino;
+        nextTetromino = nextPiece();
+        currentRow = SPAWN_ROW;
+        currentCol = SPAWN_COL;
+        setGameOverIfCurrentPieceCannotSpawn();
+    }
+
+    private void setGameOverIfCurrentPieceCannotSpawn() {
+        if (!canPlaceCurrentAt(currentRow, currentCol)) {
+            gameState = GameState.GAME_OVER;
+        }
     }
 
     /** Result of one gravity step or a hard drop. */
@@ -246,46 +325,14 @@ public class Game {
         return true;
     }
 
-    /* Temporary accessors for moving GamePanel state before moving its rules. */
-    Board boardForTransition() {
+    /* Package-private setup hooks used by deterministic game tests. */
+    Board boardForTest() {
         return board;
     }
 
-    Tetromino currentTetrominoForTransition() {
-        return currentTetromino;
-    }
-
-    Tetromino nextTetrominoForTransition() {
-        return nextTetromino;
-    }
-
-    Tetromino holdTetrominoForTransition() {
-        return holdTetromino;
-    }
-
-    Tetromino nextPieceForTransition() {
-        return nextPiece();
-    }
-
-    void setCurrentTetrominoForTransition(Tetromino tetromino) {
-        currentTetromino = tetromino;
-    }
-
-    void setNextTetrominoForTransition(Tetromino tetromino) {
-        nextTetromino = tetromino;
-    }
-
-    void setHoldTetrominoForTransition(Tetromino tetromino) {
-        holdTetromino = tetromino;
-    }
-
-    void setCurrentPositionForTransition(int row, int col) {
+    void setCurrentPositionForTest(int row, int col) {
         currentRow = row;
         currentCol = col;
-    }
-
-    void setHoldUsedForTransition(boolean holdUsed) {
-        this.holdUsed = holdUsed;
     }
 
     void setGameStateForTransition(GameState gameState) {
