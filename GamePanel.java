@@ -45,8 +45,9 @@ class GamePanel extends JPanel implements KeyListener {
                 return;
             }
 
-            if (!game.moveDown()) {
-                landTetromino(false);
+            Game.StepResult result = game.tick();
+            if (result.isPieceLocked()) {
+                handlePieceLocked(result, false);
             }
 
             repaint();
@@ -208,10 +209,6 @@ class GamePanel extends JPanel implements KeyListener {
         }
     }
 
-    private void addScore(int clearedRows) {
-        game.setScoreForTransition(game.getScore() + clearedRows * 100);
-    }
-
     private void drawScore(Graphics g) {
 
         g.setColor(Color.BLACK);
@@ -220,27 +217,6 @@ class GamePanel extends JPanel implements KeyListener {
 
         g.drawString("LEVEL", UI_X, LEVEL_Y);
         g.drawString(String.valueOf(game.getLevel()), UI_X, LEVEL_Y + 25);
-    }
-
-    private void updateLevel() {
-        game.setLevelForTransition(game.getScore() / 1000 + 1);
-        timer.setDelay(getDropInterval());  // レベルに応じて落下速度を変更
-    }
-
-    private void lockBlock() {
-        int currentRow = game.getCurrentRow();
-        int currentCol = game.getCurrentCol();
-        Tetromino current = game.currentTetrominoForTransition();
-        int[][] shape = current.getShape();
-
-        for (int r = 0; r < shape.length; r++) {
-            for (int c = 0; c < shape[r].length; c++) {
-                if (shape[r][c] == 1) {
-                    game.boardForTransition().setBlock(
-                        currentRow + r, currentCol + c, current.getColor());
-                }
-            }
-        }
     }
 
     private boolean canSpawn() {
@@ -282,20 +258,17 @@ class GamePanel extends JPanel implements KeyListener {
         game.setCurrentPositionForTransition(SPAWN_ROW, SPAWN_COL);
     }
 
-    private void landTetromino(boolean hardDropped) {
-        lockBlock();
+    private void handlePieceLocked(Game.StepResult result, boolean hardDropped) {
         if (hardDropped) {
             soundEffectPlayer.playDrop();
         } else {
             soundEffectPlayer.playLock();
         }
 
-        int clearedRows = game.boardForTransition().clearFullRows();
-        if (clearedRows > 0) {
+        if (result.getClearedRows() > 0) {
             soundEffectPlayer.playClear();
         }
-        addScore(clearedRows);
-        updateLevel();
+        timer.setDelay(getDropInterval());
 
         spawnTetromino();
         game.setHoldUsedForTransition(false);
@@ -307,11 +280,8 @@ class GamePanel extends JPanel implements KeyListener {
     }
 
     private void hardDrop() {
-        while (game.moveDown()) {
-            // Keep moving until the next cell is blocked.
-        }
-
-        landTetromino(true);
+        Game.StepResult result = game.hardDrop();
+        handlePieceLocked(result, true);
         repaint();
     }
 

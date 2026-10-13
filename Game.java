@@ -1,10 +1,7 @@
 import java.awt.Color;
 import java.util.Objects;
 
-/**
- * Holds the initial game state and exposes it to callers without exposing
- * mutable model objects. Game rules are added here in later migration steps.
- */
+/** Holds game state and screen-independent game rules. */
 public class Game {
     private static final int SPAWN_ROW = 0;
     private static final int SPAWN_COL = 3;
@@ -156,6 +153,69 @@ public class Game {
         return false;
     }
 
+    /** Advances the game by one automatic gravity step. */
+    public StepResult tick() {
+        if (moveDown()) {
+            return StepResult.moved();
+        }
+        return lockCurrentPiece();
+    }
+
+    /** Drops the current piece as far as possible, then locks it. */
+    public StepResult hardDrop() {
+        while (moveDown()) {
+            // Continue until the next cell is blocked.
+        }
+        return lockCurrentPiece();
+    }
+
+    private StepResult lockCurrentPiece() {
+        int[][] shape = currentTetromino.getShape();
+        for (int row = 0; row < shape.length; row++) {
+            for (int col = 0; col < shape[row].length; col++) {
+                if (shape[row][col] == 1) {
+                    board.setBlock(
+                        currentRow + row,
+                        currentCol + col,
+                        currentTetromino.getColor()
+                    );
+                }
+            }
+        }
+
+        int clearedRows = board.clearFullRows();
+        score += clearedRows * 100;
+        level = score / 1000 + 1;
+        return StepResult.locked(clearedRows);
+    }
+
+    /** Result of one gravity step or a hard drop. */
+    public static final class StepResult {
+        private final boolean pieceLocked;
+        private final int clearedRows;
+
+        private StepResult(boolean pieceLocked, int clearedRows) {
+            this.pieceLocked = pieceLocked;
+            this.clearedRows = clearedRows;
+        }
+
+        private static StepResult moved() {
+            return new StepResult(false, 0);
+        }
+
+        private static StepResult locked(int clearedRows) {
+            return new StepResult(true, clearedRows);
+        }
+
+        public boolean isPieceLocked() {
+            return pieceLocked;
+        }
+
+        public int getClearedRows() {
+            return clearedRows;
+        }
+    }
+
     /** Returns whether the current piece can move down from the given row. */
     boolean canMoveDownFromRow(int row) {
         return canPlaceCurrentAt(row + 1, currentCol);
@@ -222,14 +282,6 @@ public class Game {
     void setCurrentPositionForTransition(int row, int col) {
         currentRow = row;
         currentCol = col;
-    }
-
-    void setScoreForTransition(int score) {
-        this.score = score;
-    }
-
-    void setLevelForTransition(int level) {
-        this.level = level;
     }
 
     void setHoldUsedForTransition(boolean holdUsed) {

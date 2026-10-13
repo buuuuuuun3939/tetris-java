@@ -156,6 +156,72 @@ class GameTest {
         assertShapeEquals(initialShape, game.getCurrentShape());
     }
 
+    @Test
+    void tickMovesPieceDownWhenSpaceIsAvailable() {
+        Game game = new Game(fixedPieces(TetrominoType.I, TetrominoType.O));
+
+        Game.StepResult result = game.tick();
+
+        assertFalse(result.isPieceLocked());
+        assertEquals(0, result.getClearedRows());
+        assertEquals(1, game.getCurrentRow());
+        assertEquals(0, game.getScore());
+    }
+
+    @Test
+    void tickLocksPieceWhenItCannotMoveDown() {
+        Game game = new Game(fixedPieces(TetrominoType.I, TetrominoType.O));
+        game.setCurrentPositionForTransition(Board.ROWS - 1, 3);
+
+        Game.StepResult result = game.tick();
+
+        assertTrue(result.isPieceLocked());
+        assertEquals(0, result.getClearedRows());
+        for (int col = 3; col < 7; col++) {
+            assertEquals(Color.CYAN,
+                game.boardForTransition().getBlock(Board.ROWS - 1, col));
+        }
+    }
+
+    @Test
+    void hardDropMovesPieceToBottomAndLocksIt() {
+        Game game = new Game(fixedPieces(TetrominoType.I, TetrominoType.O));
+
+        Game.StepResult result = game.hardDrop();
+
+        assertTrue(result.isPieceLocked());
+        assertEquals(Board.ROWS - 1, game.getCurrentRow());
+        for (int col = 3; col < 7; col++) {
+            assertEquals(Color.CYAN,
+                game.boardForTransition().getBlock(Board.ROWS - 1, col));
+        }
+    }
+
+    @Test
+    void clearingLinesUpdatesScoreAndLevel() {
+        Game game = new Game(fixedPieces(TetrominoType.I, TetrominoType.O));
+        game.setCurrentPositionForTransition(Board.ROWS - 1, 3);
+
+        for (int line = 0; line < 10; line++) {
+            for (int col = 0; col < Board.COLS; col++) {
+                if (col < 3 || col > 6) {
+                    game.boardForTransition().setBlock(
+                        Board.ROWS - 1, col, Color.GRAY);
+                }
+            }
+
+            Game.StepResult result = game.hardDrop();
+            assertTrue(result.isPieceLocked());
+            assertEquals(1, result.getClearedRows());
+        }
+
+        assertEquals(1000, game.getScore());
+        assertEquals(2, game.getLevel());
+        for (int col = 0; col < Board.COLS; col++) {
+            assertNull(game.boardForTransition().getBlock(Board.ROWS - 1, col));
+        }
+    }
+
     private static void assertShapeEquals(int[][] expected, int[][] actual) {
         assertEquals(expected.length, actual.length);
         for (int row = 0; row < expected.length; row++) {
