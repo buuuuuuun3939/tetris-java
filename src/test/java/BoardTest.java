@@ -10,6 +10,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class BoardTest {
 
     @Test
+    void boardDimensionsMatchRowsColumnsAndBlockSize() {
+        Board board = new Board();
+
+        assertEquals(Board.COLS * Board.BLOCK_SIZE, Board.getWidth());
+        assertEquals(Board.ROWS * Board.BLOCK_SIZE, board.getHeight());
+    }
+
+    @Test
     void newBoardStartsEmpty() {
         Board board = new Board();
 
@@ -19,6 +27,20 @@ class BoardTest {
                     "new board should be empty at row=" + row + ", col=" + col);
             }
         }
+    }
+
+    @Test
+    void setBlockAndGetBlockUseRequestedCoordinates() {
+        Board board = new Board();
+        Color firstColor = Color.CYAN;
+        Color secondColor = Color.ORANGE;
+
+        board.setBlock(3, 2, firstColor);
+        board.setBlock(4, 7, secondColor);
+
+        assertEquals(firstColor, board.getBlock(3, 2));
+        assertEquals(secondColor, board.getBlock(4, 7));
+        assertNull(board.getBlock(3, 7));
     }
 
     @Test

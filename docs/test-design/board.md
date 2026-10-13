@@ -16,6 +16,8 @@
 | BRD-REQ-03 | 1行を消去すると、上の行は1段下がり、最上段は空になる。 |
 | BRD-REQ-04 | 完成行をすべて消去し、消去した行数を返す。 |
 | BRD-REQ-05 | `clear()` の後は全マスが空である。 |
+| BRD-REQ-06 | 盤面のピクセル寸法は、列数・行数にブロックサイズを掛けた値である。 |
+| BRD-REQ-07 | 指定した行・列にブロックを設定し、その位置から取得できる。 |
 
 ## テストケース
 
@@ -31,6 +33,8 @@
 | BRD-004c | 隣接した完成行が2行ある盤面 | `clearFullRows()` を呼ぶ | 戻り値が2で、両方が消去される | P1 | 実装済み・未実行 |
 | BRD-004d | 離れた完成行が2行ある盤面 | `clearFullRows()` を呼ぶ | 戻り値が2で、両方が消去される。間の未完成行は保持される | P1 | 実装済み・未実行 |
 | BRD-005 | 一部または全マスにブロックがある盤面 | `clear()` を呼ぶ | 全マスが `null` | P2 | 実装済み・未実行 |
+| BRD-006 | `Board` の定数 | `getWidth()` と `getHeight()` を呼び出す | 幅が `COLS * BLOCK_SIZE`、高さが `ROWS * BLOCK_SIZE` | P2 | 実装済み・未実行 |
+| BRD-007 | 新しい `Board` | 異なる行・列に色を設定し、指定位置と未設定位置を取得する | 設定した位置から該当色を取得でき、未設定位置は `null` | P1 | 実装済み・未実行 |
 
 ## テストメソッドとの対応
 
@@ -46,6 +50,8 @@
 | BRD-004c | `clearFullRowsRemovesAdjacentCompletedRows` |
 | BRD-004d | `clearFullRowsRemovesNonAdjacentCompletedRowsAndKeepsRowsBetweenThem` |
 | BRD-005 | `clearRemovesEveryBlock` |
+| BRD-006 | `boardDimensionsMatchRowsColumnsAndBlockSize` |
+| BRD-007 | `setBlockAndGetBlockUseRequestedCoordinates` |
 
 ## 実装時の注意
 
