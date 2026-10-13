@@ -112,6 +112,60 @@ public class Game {
         return gameState;
     }
 
+    /* Temporary accessors for moving GamePanel state before moving its rules. */
+    Board boardForTransition() {
+        return board;
+    }
+
+    Tetromino currentTetrominoForTransition() {
+        return currentTetromino;
+    }
+
+    Tetromino nextTetrominoForTransition() {
+        return nextTetromino;
+    }
+
+    Tetromino holdTetrominoForTransition() {
+        return holdTetromino;
+    }
+
+    Tetromino nextPieceForTransition() {
+        return nextPiece();
+    }
+
+    void setCurrentTetrominoForTransition(Tetromino tetromino) {
+        currentTetromino = tetromino;
+    }
+
+    void setNextTetrominoForTransition(Tetromino tetromino) {
+        nextTetromino = tetromino;
+    }
+
+    void setHoldTetrominoForTransition(Tetromino tetromino) {
+        holdTetromino = tetromino;
+    }
+
+    void setCurrentPositionForTransition(int row, int col) {
+        currentRow = row;
+        currentCol = col;
+    }
+
+    void setScoreForTransition(int score) {
+        this.score = score;
+    }
+
+    void setLevelForTransition(int level) {
+        this.level = level;
+    }
+
+    void setHoldUsedForTransition(boolean holdUsed) {
+        this.holdUsed = holdUsed;
+    }
+
+    void setGameStateForTransition(GameState gameState) {
+        this.gameState = gameState;
+    }
+
     private static int[][] copyShape(int[][] shape) {
         int[][] copy = new int[shape.length][];
         for (int row = 0; row < shape.length; row++) {
