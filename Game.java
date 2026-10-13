@@ -116,6 +116,29 @@ public class Game {
         return gameState;
     }
 
+    /** Pauses the game when it is currently playing. */
+    public void pause() {
+        if (gameState == GameState.PLAYING) {
+            gameState = GameState.PAUSED;
+        }
+    }
+
+    /** Resumes the game when it is currently paused. */
+    public void resume() {
+        if (gameState == GameState.PAUSED) {
+            gameState = GameState.PLAYING;
+        }
+    }
+
+    /** Returns the lowest row the current piece can occupy. */
+    public int getGhostRow() {
+        int ghostRow = currentRow;
+        while (canPlaceCurrentAt(ghostRow + 1, currentCol)) {
+            ghostRow++;
+        }
+        return ghostRow;
+    }
+
     public boolean moveLeft() {
         if (gameState != GameState.PLAYING) {
             return false;
@@ -143,7 +166,7 @@ public class Game {
         if (gameState != GameState.PLAYING) {
             return false;
         }
-        if (!canMoveDownFromRow(currentRow)) {
+        if (!canPlaceCurrentAt(currentRow + 1, currentCol)) {
             return false;
         }
         currentRow++;
@@ -295,11 +318,6 @@ public class Game {
         }
     }
 
-    /** Returns whether the current piece can move down from the given row. */
-    boolean canMoveDownFromRow(int row) {
-        return canPlaceCurrentAt(row + 1, currentCol);
-    }
-
     private boolean canPlaceCurrentAt(int row, int col) {
         return canPlace(currentTetromino.getShape(), row, col);
     }
@@ -333,10 +351,6 @@ public class Game {
     void setCurrentPositionForTest(int row, int col) {
         currentRow = row;
         currentCol = col;
-    }
-
-    void setGameStateForTransition(GameState gameState) {
-        this.gameState = gameState;
     }
 
     private static int[][] copyShape(int[][] shape) {

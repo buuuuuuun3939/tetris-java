@@ -141,14 +141,14 @@ class GamePanel extends JPanel implements KeyListener {
     }
 
     private void startGame() {
-        game.setGameStateForTransition(GameState.PLAYING);
+        game.resume();
         timer.start();
         bgmPlayer.play();
         repaint();
     }
 
     private void stopGame() {
-        game.setGameStateForTransition(GameState.PAUSED);
+        game.pause();
         timer.stop();
         bgmPlayer.stop();
         repaint();
@@ -266,9 +266,8 @@ class GamePanel extends JPanel implements KeyListener {
     }
 
     private void drawGhostTetromino(Graphics g) {
-        int ghostY = getGhostY();
         int[][] shape = game.getCurrentShape();
-        int currentRow = ghostY / Board.BLOCK_SIZE;
+        int ghostRow = game.getGhostRow();
         int currentCol = game.getCurrentCol();
 
         g.setColor(Color.LIGHT_GRAY);
@@ -281,7 +280,7 @@ class GamePanel extends JPanel implements KeyListener {
                 }
 
                 int x = (currentCol + col) * Board.BLOCK_SIZE;
-                int y = (currentRow + row) * Board.BLOCK_SIZE;
+                int y = (ghostRow + row) * Board.BLOCK_SIZE;
 
                 g.drawRect(
                     x,
@@ -486,16 +485,6 @@ class GamePanel extends JPanel implements KeyListener {
         game.restart();
         timer.setDelay(getDropInterval()); // タイマーの落下間隔を500msにリセット
         startGame();
-    }
-
-    private int getGhostY() {
-        int ghostY = game.getCurrentRow() * Board.BLOCK_SIZE;
-
-        while (game.canMoveDownFromRow(ghostY / Board.BLOCK_SIZE)) {
-            ghostY += Board.BLOCK_SIZE;
-        }
-
-        return ghostY;
     }
 
 }

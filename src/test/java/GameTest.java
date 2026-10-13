@@ -295,7 +295,7 @@ class GameTest {
         game.hardDrop();
         game.hold();
         game.boardForTest().setBlock(5, 5, Color.BLUE);
-        game.setGameStateForTransition(GameState.PAUSED);
+        game.pause();
 
         game.restart();
 
